@@ -119,7 +119,7 @@ if (fileUpload) {
 const initWallet = async() => {
     if (localStorage.walletAddress && document.getElementById('walletAddress')) {
         document.getElementById('walletAddress').innerText = localStorage?.walletAddress || '';
-        new QRCode(document.getElementById("qrcode"), localStorage.walletAddress);
+        var qrcode = new QRCode("qrcode", localStorage?.walletAddress);
         document.getElementsByClassName('backup-wallet')[0].style.display = 'block';
         const balance = await getWalletBalance(localStorage.walletAddress);
         document.getElementById('walletBalance').innerText = `${balance / 100000000} BSV`;
