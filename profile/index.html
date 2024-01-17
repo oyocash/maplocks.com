@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <link href="/styles/shuallet.css" rel="stylesheet" type="text/css">
+        <script src="/scripts/bsv.browser.min.js"></script>
+        <script src="/scripts/api.js"></script>
+        <script src="/scripts/message.js"></script>
+        <script src="/scripts/params.js"></script>
+        <script src="/scripts/bSocial.js"></script>
+        <script src="/scripts/bSocialPost.js"></script>
+        <script src="/scripts/bSocialLike.js"></script>
+        <script src="/scripts/bHelpers.js"></script>
+        <script src="/scripts/helpers.js"></script>
+        <script src="/scripts/bsv-lock.js"></script>
+        <script src="/scripts/idb.js"></script>
+        <script src="/scripts/qrcode.js"></script>
+
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f5f5f5;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+            }
+
+            .container {
+                text-align: center;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            a {
+                text-decoration: none;
+                color: rgb(255, 138, 76);
+            }
+
+            .wallet-address, .wallet-balance {
+                margin: 10px 0px;
+                font-size: 18px;
+                color: #555;
+            }
+
+            .create-wallet, .backup-wallet {
+                margin-top: 20px;
+            }
+
+            button {
+                padding: 10px 20px;
+                margin: 0 5px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                background-color: #f7931a; /* Bitcoin orange background */
+                color: #fff;
+                font-size: 16px;
+            }
+        </style>
+    </head>
+</html>
+<body>
+    <div class="btns center" id="shlogin">
+        <a href="/">Back to maplocks</a>
+        <div id="walletAddress" class="wallet-address"></div>
+        <div id="qrcode"></div>
+        <div id="walletBalance" class="wallet-balance"></div>
+        <div class="create-wallet">
+            <button onclick="setupWallet()">Create or import SHUAllet</button>
+        </div>
+        <div class="backup-wallet">
+            <button onclick="backupWallet()">Backup Wallet</button>
+            <button onclick="sendBSV()">Send</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+    <input type="file" id="uploadFile" accept=".json" hidden>
+</body>
+<script src="/scripts/SHUAllet.js"></script>
+<script src="/scripts/oneSatOrdinals.js"></script>
+<script src="/scripts/bsv20.js"></script>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+    })
+</script>

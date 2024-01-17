@@ -1,0 +1,409 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+        <script src="/scripts/rbush.js"></script>
+        <script src="/scripts/Leaflet.LayerGroup.Collision.js"></script>
+
+        <script src="/scripts/leaflet-color-markers.js"></script>
+        <link href="/styles/shuallet.css" rel="stylesheet" type="text/css">
+        <script src="/scripts/bsv.browser.min.js"></script>
+        <script src="/scripts/api.js"></script>
+        <script src="/scripts/message.js"></script>
+        <script src="/scripts/params.js"></script>
+        <script src="/scripts/bSocial.js"></script>
+        <script src="/scripts/bSocialPost.js"></script>
+        <script src="/scripts/bSocialLike.js"></script>
+        <script src="/scripts/bHelpers.js"></script>
+        <script src="/scripts/helpers.js"></script>
+        <script src="/scripts/bsv-lock.js"></script>
+        <script src="/scripts/idb.js"></script>
+
+        <style type="text/css">
+            @font-face { font-family: RobotoFlex; src: url('RobotoFlex-Regular.ttf'); }
+            html, body {
+              height: 100%;
+              margin: 0;
+              padding: 0;
+            }
+            #map { height: 100%; }
+            #walletButton {
+              position: absolute;
+              top: 30px;
+              right: 10px;
+              padding: 10px;
+              z-index: 400;
+            }
+            .leaflet-container a.woc-icon {
+                position: absolute;
+                top: 0;
+                left: 0;
+                padding-top:5px;
+                border: none;
+                text-align: center;
+                width: 24px;
+                height: 24px;
+                font: 16px/24px Tahoma, Verdana, sans-serif;
+                color: #757575;
+                text-decoration: none;
+                background: transparent;
+            }
+            .transparent-tooltip {
+              -webkit-text-stroke: 0.5px white; /* width and color */
+              color: #a00;
+              font-size: 1.15em;
+              font-weight: 900;
+              background: transparent;
+              border: none;
+              box-shadow: none;
+              text-align: center;
+            }
+            .transparent-tooltip::before {
+              border: none;
+            }
+            .tooltip-title {
+                font-family: RobotoFlex;
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 20px;
+                background: rgb(243, 244, 246);
+                text-align: center;
+                font-family: RobotoFlex;
+                padding:5px;
+                margin-top:-15px;
+                margin-left:-21px;
+                margin-right: -25px;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+            }
+            .tooltip-content {
+                color: rgb(107, 114, 128);
+                font-family: RobotoFlex;
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 20px;
+                text-align: center;
+                vertical-align: middle;
+                margin:10px 0px;
+            }
+            .coinIcon {
+                color: rgb(255, 138, 76);
+                font-size: 14px;
+                height: 14px;
+                line-height: 20px;
+                margin-left: 4px;
+                vertical-align: middle;
+                width: 14px;
+                margin-bottom: 2px;
+            }
+            .popupForm {
+                text-align: center;
+            }
+            .popupForm table {
+            }
+            .popupForm th {
+                font-family: RobotoFlex;
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 20px;
+                margin:5px;
+            }
+            .popupForm td {
+                font-family: RobotoFlex;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 20px;
+                margin:5px;
+            }
+            .popupForm input {
+                border-radius: 12px;
+                border: 1px solid rgb(209, 213, 219);
+                background: rgb(249, 250, 251);
+                padding: 10px; 
+                width: 100px;
+                height: 25px;
+                font-family: RobotoFlex;
+                font-size: 14px;
+                color: rgb(17, 24, 39);
+            }
+            .popupForm input.long {
+                width: 250px;
+            }
+            .popupForm select {
+                border-radius: 12px;
+                border: 1px solid rgb(209, 213, 219);
+                background: rgb(249, 250, 251);
+                padding: 3px; 
+                font-family: RobotoFlex;
+                font-size: 14px;
+                color: rgb(17, 24, 39);
+            }
+            .popupForm button {
+                background-color: rgba(0, 0, 0, 0);
+                background-image: linear-gradient(to right bottom, rgb(253, 186, 140), rgb(208, 56, 1));
+                border: 1px solid #fff;
+                border-radius: 12px;
+                color: rgb(255, 255, 255);
+                cursor:pointer;
+                font-family: RobotoFlex;
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 20px;
+                margin-top: 5px;
+                padding: 8px 16px;
+            }
+
+        </style>
+
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+    </head>
+</html>
+<body>
+<div id="mainContainer">
+  <div id="mapDiv">
+    <div id="map"></div>
+    <button class="btn shuallet" id="walletButton"  onclick="location.href='/profile/';">
+        <img src="/assets/shuacoin.png" class="shuapng">
+        <span class="btn-text">SHUAllet</span>
+    </button>
+  </div>
+  <div id="bars"></div>
+</div>
+</body>
+<script src="/scripts/SHUAllet.js"></script>
+
+<script type="text/javascript">
+    window.dataURL = "https://data.trends.cash:9007/"
+
+    var geoPoints = []    
+    var userMarker;
+    var activeMarker;
+    var latit = null;
+    var longit = null;
+
+    var getUrlVars = function() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+          vars[key] = value;
+      });
+      return vars;
+    }
+
+    const addMarker = (i, addCollision = 1) => {
+        var iconStyle;
+        if (geoPoints[i].bsv === 0.00000001) iconStyle = bit00000001Icon; else
+        if (geoPoints[i].bsv < 0.001) iconStyle = bit0001Icon; else
+        if (geoPoints[i].bsv < 0.01) iconStyle = bit001Icon; else
+        if (geoPoints[i].bsv < 0.1) iconStyle = bit01Icon; else
+        if (geoPoints[i].bsv < 1) iconStyle = bit1Icon; else
+        if (geoPoints[i].bsv < 10) iconStyle = bit10Icon; else
+        if (geoPoints[i].bsv < 100) iconStyle = bit100Icon; else
+        if (geoPoints[i].bsv < 1000) iconStyle = bit1000Icon; else
+        if (geoPoints[i].bsv < 100000) iconStyle = bit1000Icon;
+
+        if (geoPoints[i] === undefined || geoPoints[i].name === undefined) {
+            console.log(i)
+            console.log(geoPoints[i])
+        }
+        var tooltipName = geoPoints[i].name.replace(/<[^>]+>/g, '');
+        var popupName = tooltipName;            
+        tooltipName = tooltipName.replace(/(.{23}[^ ]* )/g, "$1<br />");
+        if (popupName.length > 36) {
+            popupName = popupName.substring(0, 36);
+            popupName = popupName.substring(0, popupName.lastIndexOf(" "))
+            popupName = popupName + "..."
+        }
+        popupName = popupName.replace(/(.{15}[^ ]* )/g, "$1<br />");
+
+        var content = `
+            <a target="_blank" rel="noopener noreferrer" class="woc-icon" href="https://whatsonchain.com/tx/${geoPoints[i].txid}"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" class="text-black dark:text-white mt-0 mr-0 w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M856 376H648V168c0-8.8-7.2-16-16-16H168c-8.8 0-16 7.2-16 16v464c0 8.8 7.2 16 16 16h208v208c0 8.8 7.2 16 16 16h464c8.8 0 16-7.2 16-16V392c0-8.8-7.2-16-16-16zm-480 16v188H220V220h360v156H392c-8.8 0-16 7.2-16 16zm204 52v136H444V444h136zm224 360H444V648h188c8.8 0 16-7.2 16-16V444h156v360z"></path></svg></a>
+
+            <div class="tooltip-title">${tooltipName}</div>
+            <div class="tooltip-content">locked: <span id="lockedBSVText">${geoPoints[i].bsv}</span><svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" class="coinIcon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><title></title><path d="M14.648 14.423l.003-.004a1.34 1.34 0 0 1-.498.659c-.269.189-.647.338-1.188.364l-1.99.004v-2.93c.288.008 1.565-.013 2.119.015.722.035 1.171.321 1.41.668.262.351.293.82.144 1.224zm-2.129-3.261c.503-.024.852-.162 1.101-.336.214-.146.375-.367.46-.611.134-.375.107-.81-.136-1.135-.223-.319-.638-.584-1.306-.616-.495-.026-1.413-.003-1.664-.01v2.709c.025.004 1.539-.001 1.545-.001zM24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-6.65 2.142c.022-1.477-1.24-2.332-1.908-2.572.715-.491 1.206-1.043 1.206-2.085 0-1.655-1.646-2.43-2.647-2.529-.082-.009-.31-.013-.31-.013V5.361h-1.633l.004 1.583H10.97V5.367H9.31v1.569c-.292.007-2.049.006-2.049.006v1.401h.571c.601.016.822.362.798.677v6.041a.408.408 0 0 1-.371.391c-.249.011-.621 0-.621 0l-.32 1.588h1.996v1.6h1.661v-1.591h1.091v1.594h1.624v-1.588c1.899.05 3.643-1.071 3.66-2.913z"></path></svg></div>
+                <div class="tooltip-content">
+                <table class="popupForm">
+                  <tr>
+                    <th>bitcoin</th>
+                    <th>blocks</th>
+                  </tr>
+                  <tr>
+                    <input id="likeIndex" type="text" name="index" value="${i}" hidden>
+                    <input id="likeTxid" type="text" name="txid" value="${geoPoints[i].txid}" hidden>
+                    <td><input id="likeCoins" type="number" name="coins" placeholder="BSV" value="0.01"></td>
+                    <td><select id="likeBlocks" name="blocks" type="number">
+                        <option value="6">1 hour</option>
+                        <option value="144" >1 day</option>
+                        <option value="1008" selected="selected">7 days</option>
+                        <option value="10950">30 days</option>
+                        <option value="52560">1 year</option>
+                        <option value="52560000">Never</option>
+                    </select></td></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2"><button id="lockToPoint" onclick="likeCoordinates(${i})">lock</button></td>
+                  </tr>
+                </table>
+                </div>
+            `
+
+        var marker = L.marker(geoPoints[i].coordinates, {icon: iconStyle})
+        .bindTooltip(popupName, {permanent: true, direction : 'bottom', className: 'transparent-tooltip', offset: [0, -15]})
+        .addTo(map)
+        marker.bindPopup(content);
+        if (addCollision) {
+            collisionLayer.addLayer(marker);
+        }
+        return marker
+    }
+
+    const pointsToMarkers = () => {
+        for (let i = 0; i < geoPoints.length; i++) {
+            if (geoPoints[i].satoshis) {
+                geoPoints[i].bsv = geoPoints[i].satoshis / 100000000
+            }
+            if (typeof geoPoints[i].coordinates === 'string' || geoPoints[i].coordinates instanceof String) {
+                geoPoints[i].coordinates = JSON.parse(geoPoints[i].coordinates)
+            }
+            addMarker(i)
+        }
+    }
+
+    const addCoordinates = async() => {
+        if (!localStorage.walletAddress) {
+            window.location.href = '/profile/';
+        }
+
+        const currentHeight = await getBlock();
+        let lockHeight = parseInt(currentHeight) + parseInt(document.getElementById('lockBlocks').value);
+        let satoshis = 1;
+        let content = document.getElementById('newPointCoordinates').value + " " + document.getElementById('newPointName').value
+
+        let rawtx = lockPost(localStorage.walletAddress, lockHeight, satoshis, null, content, null);
+        if (rawtx) {
+            const c = confirm(`Add location "${document.getElementById('newPointCoordinates').value}"?`);
+            if (c) {
+                map.closePopup();
+                rawtx = await payForRawTx(rawtx)
+                const t = await broadcast(rawtx, true, localStorage.walletAddress);
+                addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
+                alert(`Maplock added: ${t}`);
+                geoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
+                addMarker(geoPoints.length - 1)
+            } else { return }
+        } 
+    }
+
+    const likeCoordinates = async (index) => {
+        if (!localStorage.walletAddress) {
+            window.location.href = '/profile/';
+        }
+
+        const currentHeight = await getBlock();
+        const lockHeight = parseInt(currentHeight) + parseInt(document.getElementById(`likeBlocks`).value);
+        const lockedBSVs = parseFloat(document.getElementById(`likeCoins`).value)
+        let satoshis = parseInt(lockedBSVs * 100000000);
+        const txid = document.getElementById(`likeTxid`).value;
+
+        let rawtx = lockLike(localStorage.walletAddress, lockHeight, satoshis, null, txid, null);
+        if (rawtx) {
+            const c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight} blocks)?`);
+            if (c) {
+                map.closePopup();
+                rawtx = await payForRawTx(rawtx)
+                const t = await broadcast(rawtx, true, localStorage.walletAddress);
+                const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
+                addTx(tx);
+                geoPoints[index].bsv += lockedBSVs
+                alert(`Maplock liked: ${t}`);
+                await collisionLayer.removeLayer(activeMarker)
+                await map.removeLayer(activeMarker);
+                addMarker(index, 0)
+            } else { return }
+        } 
+    }
+
+    const getGeoPoints = async (northEastLat, northEastLng, southWestLat, southWestLng) => {
+        const r = await fetch(`${dataURL}getMaplocks/`, {
+            method: 'post',
+            body: JSON.stringify({ northEastLat, northEastLng, southWestLat, southWestLng })
+        })
+        const res = await r.text();
+        console.log(res);
+        return JSON.parse(res);
+    }
+
+    latit = getUrlVars()["latit"]
+    longit = getUrlVars()["longit"]
+
+    if (latit === null || latit === undefined || longit === null || longit === undefined) {
+        latit = 0; longit = 0
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            latit = position.coords.latitude;
+            longit = position.coords.longitude;
+            // move the map to have the location in its center
+            map.panTo(new L.LatLng(latit, longit));
+          })
+        } 
+    }
+
+    map = L.map('map', {
+      doubleClickZoom: false
+    }).setView([latit, longit], 13); 
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    //add search
+    L.Control.geocoder().addTo(map);
+
+    // add collision layer
+    var collisionLayer = L.LayerGroup.collision({margin:15});
+    collisionLayer.addTo(map);
+
+    pointsToMarkers()
+    
+    map.on('popupopen', function(e) {
+      activeMarker = e.popup._source;
+    });
+    // map moved
+    map.on('moveend', async function() {
+        // get bounds
+        var bounds = map.getBounds();
+        northEast = bounds.getNorthEast(),
+        southWest = bounds.getSouthWest(),
+        geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
+        pointsToMarkers()
+    });
+    // map clicked
+
+    map.on('click', function (e) {
+        if (userMarker) { // check
+           map.removeLayer(userMarker); // remove old layers
+           userMarker = null;
+        } else {
+            userMarker = new L.Marker([e.latlng.lat, e.latlng.lng], {icon: bitWhiteIcon}).addTo(map);
+            var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
+                <div class="tooltip-content">[${e.latlng.lat}, ${e.latlng.lng}]</div>
+                <input type="point" id="newPointCoordinates" value="[${e.latlng.lat}, ${e.latlng.lng}]" hidden>
+                <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="name" placeholder="name"></div>
+                <div class="tooltip-content popupForm">Expires in: 
+                    <select id="lockBlocks" name="blocks" type="number">
+                        <option value="6">1 hour</option>
+                        <option value="144">1 day</option>
+                        <option value="1008">7 days</option>
+                        <option value="10950">30 days</option>
+                        <option value="52560">1 year</option>
+                        <option value="52560000" selected="selected">Never</option>
+                    </select>
+                </div>
+                <div class="tooltip-content popupForm"><button id="newPoint" onclick="addCoordinates()">Add</button></div>`
+            userMarker.bindPopup(contentUserMarkerTooltip).openPopup();
+        }  
+    });
+</script>
