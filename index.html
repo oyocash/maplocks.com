@@ -72,9 +72,8 @@
             .tooltip-title {
                 font-family: RobotoFlex;
                 font-size: 16px;
-                font-weight: 600;
+                font-weight: 500;
                 line-height: 32px;
-                height: 32px;
                 background: rgb(243, 244, 246);
                 text-align: center;
                 font-family: RobotoFlex;
@@ -174,19 +173,20 @@
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
     </head>
+    <body>
+    <div id="mainContainer">
+      <div id="mapDiv">
+        <div id="map"></div>
+        <button class="btn shuallet" id="walletButton"  onclick="location.href='/profile/';">
+            <img src="/assets/shuacoin.png" class="shuapng">
+            <span class="btn-text">SHUAllet</span>
+        </button>
+      </div>
+      <div id="bars"></div>
+    </div>
+    </body>
 </html>
-<body>
-<div id="mainContainer">
-  <div id="mapDiv">
-    <div id="map"></div>
-    <button class="btn shuallet" id="walletButton"  onclick="location.href='/profile/';">
-        <img src="/assets/shuacoin.png" class="shuapng">
-        <span class="btn-text">SHUAllet</span>
-    </button>
-  </div>
-  <div id="bars"></div>
-</div>
-</body>
+
 <script src="/scripts/SHUAllet.js"></script>
 
 <script type="text/javascript">
@@ -386,7 +386,7 @@
         } 
     }
 
-    var map = L.map('map', {
+    const map = L.map('map', {
       doubleClickZoom: false
     })
 
@@ -395,13 +395,27 @@
     });
 
     map.setView([latit, longit], 13); 
+
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    //add search
-    L.Control.geocoder().addTo(map);
+    // search
+    var geocoder = L.Control.geocoder({
+      defaultMarkGeocode: false
+    })
+      .on('markgeocode', function(e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+          bbox.getSouthEast(),
+          bbox.getNorthEast(),
+          bbox.getNorthWest(),
+          bbox.getSouthWest()
+        ]).addTo(map);
+        map.fitBounds(poly.getBounds());
+      })
+      .addTo(map);
 
     // add collision layer
     var collisionLayer = L.LayerGroup.collision({margin:15});

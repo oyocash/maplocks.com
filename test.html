@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title>Maplocks.com - real world locks</title>
+        <meta name="description" content="BSV locks in the real world. Locks bitcoins on the Earths's map.">
+        <meta name=”robots” content="index, follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.css"/>        
+        <script src="https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.umd.js"></script>
+
+
+        <style type="text/css">
+            @font-face { font-family: RobotoFlex; src: url('RobotoFlex-Regular.ttf'); }
+            html, body {
+              height: 100%;
+              margin: 0;
+              padding: 0;
+            }
+            #map { height: 100%; }
+        </style>
+
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+    </head>
+    <body>
+<div id="map"></div>
+    </body>
+</html>
+
+<script type="text/javascript">
+const map = L.map('map').setView([51.505, -0.09], 13);
+
+L.tileLayer('//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+const search = new GeoSearch.GeoSearchControl({
+  provider: new GeoSearch.OpenStreetMapProvider(),
+});
+
+map.addControl(search);
+</script>
