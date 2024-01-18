@@ -73,11 +73,12 @@
                 font-family: RobotoFlex;
                 font-size: 16px;
                 font-weight: 600;
-                line-height: 22px;
+                line-height: 32px;
+                height: 32px;
                 background: rgb(243, 244, 246);
                 text-align: center;
                 font-family: RobotoFlex;
-                padding:5px;
+                padding:10px, 10px;
                 margin-top:-15px;
                 margin-left:-21px;
                 margin-right: -25px;
@@ -160,6 +161,13 @@
                 margin-top: 5px;
                 padding: 8px 16px;
             }
+            .align-right {
+                text-align: right;
+                margin-right:0px;
+            }
+            .popupForm a {
+                color: #757575;
+            }
         </style>
 
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -233,7 +241,7 @@
                 <table class="popupForm">
                   <tr>
                     <th>bitcoin</th>
-                    <th>blocks</th>
+                    <th>lock for</th>
                   </tr>
                   <tr>
                     <input id="likeIndex" type="text" name="index" value="${i}" hidden>
@@ -245,11 +253,18 @@
                         <option value="1008" selected="selected">7 days</option>
                         <option value="10950">30 days</option>
                         <option value="52560">1 year</option>
-                        <option value="52560000">Never</option>
+                        <option value="525600">10 years</option>
                     </select></td></td>
                   </tr>
                   <tr>
                     <td colspan="2"><button id="lockToPoint" onclick="likeCoordinates(${i})">lock</button></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" class="align-right">
+                        <a onclick="copyLinkToClipboard(${geoPoints[i].coordinates[0]}, ${geoPoints[i].coordinates[1]})">
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-black dark:text-white" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M8 9h-1a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-8a2 2 0 0 0 -2 -2h-1"></path><path d="M12 14v-11"></path><path d="M9 6l3 -3l3 3"></path></svg>
+                        </a>
+                    </td>
                   </tr>
                 </table>
                 </div>
@@ -341,6 +356,21 @@
         return JSON.parse(res);
     }
 
+    const populatePoints = async () => {
+        // get bounds
+        var bounds = map.getBounds();
+        northEast = bounds.getNorthEast(),
+        southWest = bounds.getSouthWest(),
+        geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
+        pointsToMarkers()
+    }
+
+    const copyLinkToClipboard = (lat, lng) => {
+        const link = "https://maplocks.com/?latit=" + lat + "&longit=" + lng
+        alert(`${link}\n\nCopied`)
+        navigator.clipboard.writeText(link);
+    }
+
     latit = getUrlVars()["latit"]
     longit = getUrlVars()["longit"]
 
@@ -356,9 +386,15 @@
         } 
     }
 
-    map = L.map('map', {
+    var map = L.map('map', {
       doubleClickZoom: false
-    }).setView([latit, longit], 13); 
+    })
+
+    map.on('load', async function() {
+        populatePoints()
+    });
+
+    map.setView([latit, longit], 13); 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -371,22 +407,12 @@
     var collisionLayer = L.LayerGroup.collision({margin:15});
     collisionLayer.addTo(map);
 
-    pointsToMarkers()
-    
     map.on('popupopen', function(e) {
       activeMarker = e.popup._source;
     });
-    // map moved
     map.on('moveend', async function() {
-        // get bounds
-        var bounds = map.getBounds();
-        northEast = bounds.getNorthEast(),
-        southWest = bounds.getSouthWest(),
-        geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
-        pointsToMarkers()
+        populatePoints()
     });
-    // map clicked
-
     map.on('click', function (e) {
         if (userMarker) { // check
            map.removeLayer(userMarker); // remove old layers
