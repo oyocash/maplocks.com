@@ -198,6 +198,7 @@
     window.dataURL = "https://data.trends.cash:9007/"
 
     var geoPoints = []
+    var localGeoPoints = []
     var userMarker;
     var activeMarker;
     var latit = null;
@@ -315,6 +316,7 @@
                 addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
                 alert(`Maplock added: ${t}`);
                 geoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
+                localGeoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
                 addMarker(geoPoints.length - 1)
             } else { return }
         } 
@@ -366,6 +368,7 @@
         southWest = bounds.getSouthWest(),
         console.log(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
         geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
+        geoPoints = geoPoints.concat(localGeoPoints)  // add locally stored geo points
         console.log(geoPoints.length)
         pointsToMarkers()
     }
