@@ -384,8 +384,8 @@
     latit = getUrlVars()["latit"]
     longit = getUrlVars()["longit"]
 
-    if (latit === null || latit === undefined || longit === null || longit === undefined || (latit === 0 && longit === 0)) {
-        latit = 0; longit = 0
+    if (latit === null || latit === undefined || longit === null || longit === undefined) {
+        latit = 51.513870548723986; longit = -0.11260986328125001;   // london
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             latit = position.coords.latitude;
