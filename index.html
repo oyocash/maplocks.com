@@ -64,7 +64,7 @@
                 background: transparent;
             }
             .transparent-tooltip {
-              -webkit-text-stroke: 0.3px white; /* width and color */
+              -webkit-text-stroke: 0.4px white; /* width and color */
               color: #a00;
               font-size: 14px;
               font-weight: 900;
@@ -196,7 +196,7 @@
 
 <script src="/scripts/SHUAllet.js"></script>
 
-<script type="text/javascript">
+<script type="module">
     window.dataURL = "https://data.trends.cash:9007/"
 
     var geoPoints = []
@@ -366,12 +366,10 @@
     const populatePoints = async () => {
         // get bounds
         var bounds = map.getBounds();
-        northEast = bounds.getNorthEast(),
-        southWest = bounds.getSouthWest(),
-        console.log(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
+        var northEast = bounds.getNorthEast();
+        var southWest = bounds.getSouthWest();
         geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
         geoPoints = geoPoints.concat(localGeoPoints)  // add locally stored geo points
-        console.log(geoPoints.length)
         pointsToMarkers()
     }
 
@@ -381,11 +379,21 @@
         navigator.clipboard.writeText(link);
     }
 
+    const getLocationFromIP = async() => {
+        console.log("hereee")
+        const r = await fetch(`http://ip-api.com/json/`)
+        const result = await r.json()
+        latit = result.lat
+        longit = result.lon
+        return
+    }
+
     latit = getUrlVars()["latit"]
     longit = getUrlVars()["longit"]
 
     if (latit === null || latit === undefined || longit === null || longit === undefined) {
-        latit = 51.513870548723986; longit = -0.11260986328125001;   // london
+        latit = 0; longit = 0;
+        await getLocationFromIP()
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             latit = position.coords.latitude;
