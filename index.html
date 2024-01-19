@@ -359,7 +359,6 @@
             body: JSON.stringify({ northEastLat, northEastLng, southWestLat, southWestLng })
         })
         const res = await r.text();
-        console.log(res);
         return JSON.parse(res);
     }
 
@@ -380,7 +379,6 @@
     }
 
     const getLocationFromIP = async() => {
-        console.log("hereee")
         const r = await fetch(`http://ip-api.com/json/`)
         const result = await r.json()
         latit = result.lat
