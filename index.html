@@ -197,7 +197,7 @@
 <script type="text/javascript">
     window.dataURL = "https://data.trends.cash:9007/"
 
-    var geoPoints = []    
+    var geoPoints = []
     var userMarker;
     var activeMarker;
     var latit = null;
@@ -223,10 +223,6 @@
         if (geoPoints[i].bsv < 1000) iconStyle = bit1000Icon; else
         if (geoPoints[i].bsv < 100000) iconStyle = bit1000Icon;
 
-        if (geoPoints[i] === undefined || geoPoints[i].name === undefined) {
-            console.log(i)
-            console.log(geoPoints[i])
-        }
         var tooltipName = geoPoints[i].name.replace(/<[^>]+>/g, '');
         var popupName = tooltipName;            
         tooltipName = tooltipName.replace(/(.{23}[^ ]* )/g, "$1<br />");
@@ -274,10 +270,9 @@
                 </table>
                 </div>
             `
-
         var marker = L.marker(geoPoints[i].coordinates, {icon: iconStyle})
         .bindTooltip(popupName, {permanent: true, direction : 'bottom', className: 'transparent-tooltip', offset: [0, -15]})
-        .addTo(map)
+        .addTo(markerLayerGroup)
         marker.bindPopup(content);
         if (addCollision) {
             collisionLayer.addLayer(marker);
@@ -285,8 +280,11 @@
         return marker
     }
 
-    const pointsToMarkers = () => {
+    const pointsToMarkers = async () => {
+        markerLayerGroup.clearLayers()
+        collisionLayer.clearLayers()
         for (let i = 0; i < geoPoints.length; i++) {
+        // for (let i = geoPoints.length - 1; i >=0; i--) {
             if (geoPoints[i].satoshis) {
                 geoPoints[i].bsv = geoPoints[i].satoshis / 100000000
             }
@@ -366,7 +364,9 @@
         var bounds = map.getBounds();
         northEast = bounds.getNorthEast(),
         southWest = bounds.getSouthWest(),
+        console.log(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
         geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
+        console.log(geoPoints.length)
         pointsToMarkers()
     }
 
@@ -394,6 +394,7 @@
     const map = L.map('map', {
       doubleClickZoom: false
     })
+    var markerLayerGroup = L.layerGroup().addTo(map);
 
     map.on('load', async function() {
         populatePoints()
