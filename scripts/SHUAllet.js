@@ -48,13 +48,17 @@ const normalizeUTXOs = utxos => {
     })
 }
 const getUTXOs = async address => {
-    const utxos = await getCachedUTXOs();
-    if (!utxos.length) {
+    // const utxos = await getCachedUTXOs();
+    // if (!utxos.length) {
         console.log(`Calling WhatsOnChain UTXOs endpoint...`);
-        const r = await fetch(`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unspent`);
-        const res = await r.json();
-        return normalizeUTXOs(res);
-    } else { return utxos }
+        const r1 = await fetch(`https://api.whatsonchain.com/v1/bsv/main/address/${address}/confirmed/unspent`);
+        const res1 = await r1.json();
+        const r2 = await fetch(`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unconfirmed/unspent`);
+        const res2 = await r2.json();
+        console.log(res1.result)
+        console.log(res2.result)
+        return normalizeUTXOs(res1.result.concat(res2.result));
+    // } else { return utxos }
 }
 const btUTXOs = async address => {
     const r = await fetch(`https://api.bitails.io/address/${address}/unspent`);
@@ -119,7 +123,9 @@ if (fileUpload) {
 const initWallet = async() => {
     if (localStorage.walletAddress && document.getElementById('walletAddress')) {
         document.getElementById('walletAddress').innerText = localStorage?.walletAddress || '';
-        var qrcode = new QRCode("qrcode", localStorage?.walletAddress);
+        var qrcode = new QRCode("qrcode", "");
+        qrcode.clear();
+        qrcode.makeCode(localStorage?.walletAddress);
         document.getElementsByClassName('backup-wallet')[0].style.display = 'block';
         const balance = await getWalletBalance(localStorage.walletAddress);
         document.getElementById('walletBalance').innerText = `${balance / 100000000} BSV`;
@@ -147,9 +153,9 @@ const backupWallet = () => {
 }
 const sendBSV = async() => {
     try {
-        const amt = prompt(`Enter satoshi amount to send:`);
+        const amt = prompt(`Enter BSV amount to send:`);
         if (amt === null) return;
-        const satoshis = parseInt(amt);
+        const satoshis = parseInt(parseFloat(amt) * 100000000);
         if (!satoshis) { throw `Invalid amount` }
         const to = prompt(`Enter address to send BSV to:`);
         if (!to) { return }
@@ -159,7 +165,7 @@ const sendBSV = async() => {
             bsvtx.to(addr, satoshis);
             const rawtx = await payForRawTx(bsvtx.toString());
             if (rawtx) {
-                const c = confirm(`Send ${satoshis} satoshis to ${addr}?`);
+                const c = confirm(`Send ${amt} BSV to ${addr}?`);
                 if (c) {
                     const t = await broadcast(rawtx, true, localStorage.walletAddress);
                     alert(t);
@@ -190,7 +196,7 @@ const restoreWallet = async(oPK, pPk, newWallet) => {
     if (!newWallet) {
         const c = confirm(`Do you want to unlock old coins? It moght take a couple of minutes.`);
         if (c) {
-            document.getElementById('walletAddress').innerText = 'Unlocking. Please wait.';
+            document.getElementById('walletAddress').innerText = 'Unlocking. It might take a couple of minutes. Please wait...';
             await getWalletBalance(localStorage.walletAddress);
             await unlockAllLockedTxs(localStorage.walletKey, localStorage.walletAddress);
         }
