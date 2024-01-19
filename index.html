@@ -380,9 +380,7 @@
 
     const getLocationFromIP = async() => {
         const r = await fetch(`${dataURL}getGeoLocation/`)
-        console.log(JSON.stringify(r))
         const result = await r.json()
-        console.log(JSON.stringify(result))
         latit = result.lat
         longit = result.lon
         return
@@ -392,8 +390,10 @@
     longit = getUrlVars()["longit"]
 
     if (latit === null || latit === undefined || longit === null || longit === undefined) {
-        latit = 0; longit = 0;
         await getLocationFromIP()
+        if (latit === null || latit === undefined || longit === null || longit === undefined) {
+            latit = 0; longit = 0;
+        }
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             latit = position.coords.latitude;
