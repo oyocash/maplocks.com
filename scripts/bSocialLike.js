@@ -27,8 +27,6 @@ class BSocialLike {
       ops.push(this.appName);
       ops.push('type');
       ops.push('like');
-      ops.push('context');
-      ops.push('tx');
       ops.push('tx');
       ops.push(this.txId);
   
