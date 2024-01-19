@@ -380,8 +380,11 @@
 
     const getLocationFromIP = async() => {
         const r = await fetch(`${dataURL}getGeoLocation/`)
-        latit = r.lat
-        longit = r.lon
+        console.log(JSON.stringify(r))
+        const result = await r.json()
+        console.log(JSON.stringify(result))
+        latit = result.lat
+        longit = result.lon
         return
     }
 
