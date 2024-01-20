@@ -56,7 +56,7 @@ const getUTXOs = async (address, use_woc = 0) => {
         // const r2 = await fetch(`https://api.whatsonchain.com/v1/bsv/main/address/${address}/unconfirmed/unspent`);
         // const res2 = await r2.json();
         // return normalizeUTXOs(res1.result.concat(res2.result));
-        
+
         const r = await fetch(`https://api.bitails.io/address/${address}/unspent`);
         const { unspent } = await r.json();
         return normalizeUTXOs(unspent);
@@ -122,13 +122,10 @@ if (fileUpload) {
         reader.readAsText(file);
     })
 }
-const initWallet = async() => {
+const initWallet = async(loadQR = 0) => {
     if (localStorage.walletAddress && document.getElementById('walletAddress')) {
         document.getElementById('walletAddress').innerText = localStorage?.walletAddress || '';
-        var qrcode = new QRCode("qrcode", "");
-        qrcode.clear();
-        qrcode.makeCode(localStorage?.walletAddress);
-        document.getElementsByClassName('backup-wallet')[0].style.display = 'block';
+        var qrcode = new QRCode("qrcode", "localStorage?.walletAddress");
         const balance = await getWalletBalance(localStorage.walletAddress);
         document.getElementById('walletBalance').innerText = `${balance / 100000000} BSV`;
         await unlockLocalTxs(localStorage.walletKey, localStorage.walletAddress)
@@ -230,4 +227,4 @@ If so, please ensure your wallet is backed up first!`);
         location.reload();
     }
 }
-initWallet();
+initWallet(1);

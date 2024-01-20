@@ -345,6 +345,8 @@
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
                 const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
                 addTx(tx);
+                console.log(i)
+                console.log(geoPoints[index].bsv)
                 geoPoints[index].bsv += lockedBSVs
                 geoPoints[index].bsv = geoPoints[index].bsv.toFixed(8);
                 localGeoPoints.push(geoPoints[index])
