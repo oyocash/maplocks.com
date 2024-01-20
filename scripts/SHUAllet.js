@@ -127,8 +127,8 @@ const initWallet = async(loadQR = 0) => {
         document.getElementById('walletAddress').innerText = localStorage?.walletAddress || '';
         if (loadQR === 1) {
             var qrcode = new QRCode("qrcode", localStorage.walletAddress);
-            document.getElementsByClassName('backup-wallet')[0].style.display = 'block';
         }
+        document.getElementsByClassName('backup-wallet')[0].style.display = 'block';
         const balance = await getWalletBalance(localStorage.walletAddress);
         document.getElementById('walletBalance').innerText = `${balance / 100000000} BSV`;
         await unlockLocalTxs(localStorage.walletKey, localStorage.walletAddress)
