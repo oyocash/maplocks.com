@@ -345,11 +345,20 @@
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
                 const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
                 addTx(tx);
-                console.log(i)
-                console.log(geoPoints[index].bsv)
-                geoPoints[index].bsv += lockedBSVs
-                geoPoints[index].bsv = geoPoints[index].bsv.toFixed(8);
-                localGeoPoints.push(geoPoints[index])
+                let localGeoPointsIndex = null;
+                for (let i = 0; i < localGeoPoints.length; i++) {
+                    if (localGeoPoints[i].txid === geoPoints[index].txid) {
+                        localGeoPointsIndex = i
+                        localGeoPoints[i].bsv += lockedBSVs
+                        localGeoPoints[i].bsv = localGeoPoints[i].bsv.toFixed(8);
+                        break
+                    }
+                }
+                if (localGeoPointsIndex === null) {
+                    geoPoints[index].bsv += lockedBSVs
+                    geoPoints[index].bsv = geoPoints[index].bsv.toFixed(8);
+                    localGeoPoints.push(geoPoints[index])
+                }
                 alert(`Maplock liked: ${t}`);
                 addMarker(index, 0)
             } else { return }
