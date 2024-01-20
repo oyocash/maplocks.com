@@ -345,9 +345,8 @@
                 const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
                 addTx(tx);
                 geoPoints[index].bsv += lockedBSVs
+                localGeoPoints.push(geoPoints[index])
                 alert(`Maplock liked: ${t}`);
-                await collisionLayer.removeLayer(activeMarker)
-                await map.removeLayer(activeMarker);
                 addMarker(index, 0)
             } else { return }
         } 
