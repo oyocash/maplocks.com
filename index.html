@@ -196,7 +196,7 @@
 
 <script src="/scripts/SHUAllet.js"></script>
 
-<script type="module">
+<script language='javascript'>
     window.dataURL = "https://data.trends.cash:9007/"
 
     var geoPoints = []
@@ -205,6 +205,7 @@
     var activeMarker;
     var latit = null;
     var longit = null;
+    var map, markerLayerGroup, collisionLayer
 
     var getUrlVars = function() {
       var vars = {};
@@ -385,90 +386,96 @@
         return
     }
 
-    latit = getUrlVars()["latit"]
-    longit = getUrlVars()["longit"]
+    const populateMap = async() => {
+        latit = getUrlVars()["latit"]
+        longit = getUrlVars()["longit"]
 
-    if (latit === null || latit === undefined || longit === null || longit === undefined) {
-        await getLocationFromIP()
         if (latit === null || latit === undefined || longit === null || longit === undefined) {
-            latit = 0; longit = 0;
+            await getLocationFromIP()
+            if (latit === null || latit === undefined || longit === null || longit === undefined) {
+                latit = 0; longit = 0;
+            }
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(function(position) {
+                latit = position.coords.latitude;
+                longit = position.coords.longitude;
+                // move the map to have the location in its center
+                map.panTo(new L.LatLng(latit, longit));
+              })
+            } 
         }
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            latit = position.coords.latitude;
-            longit = position.coords.longitude;
-            // move the map to have the location in its center
-            map.panTo(new L.LatLng(latit, longit));
+
+        map = L.map('map', {
+          doubleClickZoom: false
+        })
+        markerLayerGroup = L.layerGroup().addTo(map);
+
+        map.on('load', async function() {
+            populatePoints()
+        });
+
+        map.setView([latit, longit], 13); 
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // search
+        var geocoder = L.Control.geocoder({
+          defaultMarkGeocode: false
+        })
+          .on('markgeocode', function(e) {
+            var bbox = e.geocode.bbox;
+            var poly = L.polygon([
+              bbox.getSouthEast(),
+              bbox.getNorthEast(),
+              bbox.getNorthWest(),
+              bbox.getSouthWest()
+            ]).addTo(map);
+            map.fitBounds(poly.getBounds());
           })
-        } 
+          .addTo(map);
+
+        // add collision layer
+        collisionLayer = L.LayerGroup.collision({margin:15});
+        collisionLayer.addTo(map);
+
+        map.on('popupopen', function(e) {
+          activeMarker = e.popup._source;
+        });
+        map.on('moveend', async function() {
+            populatePoints()
+        });
+        map.on('click', function (e) {
+            if (userMarker) { // check
+               map.removeLayer(userMarker); // remove old layers
+               userMarker = null;
+            } else {
+                userMarker = new L.Marker([e.latlng.lat, e.latlng.lng], {icon: bitWhiteIcon}).addTo(map);
+                var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
+                    <div class="tooltip-content">[${e.latlng.lat}, ${e.latlng.lng}]</div>
+                    <input type="point" id="newPointCoordinates" value="[${e.latlng.lat}, ${e.latlng.lng}]" hidden>
+                    <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="name" placeholder="name"></div>
+                    <div class="tooltip-content popupForm">Expires in: 
+                        <select id="lockBlocks" name="blocks" type="number">
+                            <option value="6">1 hour</option>
+                            <option value="144">1 day</option>
+                            <option value="1008">7 days</option>
+                            <option value="10950">30 days</option>
+                            <option value="52560">1 year</option>
+                            <option value="52560000" selected="selected">Never</option>
+                        </select>
+                    </div>
+                    <div class="tooltip-content popupForm"><button id="newPoint" onclick="addCoordinates()">Add</button></div>`
+                userMarker.bindPopup(contentUserMarkerTooltip).openPopup();
+            }  
+        });
     }
 
-    const map = L.map('map', {
-      doubleClickZoom: false
-    })
-    var markerLayerGroup = L.layerGroup().addTo(map);
-
-    map.on('load', async function() {
-        populatePoints()
-    });
-
-    map.setView([latit, longit], 13); 
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    // search
-    var geocoder = L.Control.geocoder({
-      defaultMarkGeocode: false
-    })
-      .on('markgeocode', function(e) {
-        var bbox = e.geocode.bbox;
-        var poly = L.polygon([
-          bbox.getSouthEast(),
-          bbox.getNorthEast(),
-          bbox.getNorthWest(),
-          bbox.getSouthWest()
-        ]).addTo(map);
-        map.fitBounds(poly.getBounds());
-      })
-      .addTo(map);
-
-    // add collision layer
-    var collisionLayer = L.LayerGroup.collision({margin:15});
-    collisionLayer.addTo(map);
-
-    map.on('popupopen', function(e) {
-      activeMarker = e.popup._source;
-    });
-    map.on('moveend', async function() {
-        populatePoints()
-    });
-    map.on('click', function (e) {
-        if (userMarker) { // check
-           map.removeLayer(userMarker); // remove old layers
-           userMarker = null;
-        } else {
-            userMarker = new L.Marker([e.latlng.lat, e.latlng.lng], {icon: bitWhiteIcon}).addTo(map);
-            var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
-                <div class="tooltip-content">[${e.latlng.lat}, ${e.latlng.lng}]</div>
-                <input type="point" id="newPointCoordinates" value="[${e.latlng.lat}, ${e.latlng.lng}]" hidden>
-                <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="name" placeholder="name"></div>
-                <div class="tooltip-content popupForm">Expires in: 
-                    <select id="lockBlocks" name="blocks" type="number">
-                        <option value="6">1 hour</option>
-                        <option value="144">1 day</option>
-                        <option value="1008">7 days</option>
-                        <option value="10950">30 days</option>
-                        <option value="52560">1 year</option>
-                        <option value="52560000" selected="selected">Never</option>
-                    </select>
-                </div>
-                <div class="tooltip-content popupForm"><button id="newPoint" onclick="addCoordinates()">Add</button></div>`
-            userMarker.bindPopup(contentUserMarkerTooltip).openPopup();
-        }  
-    });
+    (async () => {
+        populateMap()
+    })().catch(e => console.log("Caught: " + e)); // Catches it.
 
     document.addEventListener("DOMContentLoaded", function() {
         if(!localStorage.getItem('disclaimerShown')) {
