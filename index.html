@@ -346,6 +346,7 @@
                 const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
                 addTx(tx);
                 geoPoints[index].bsv += lockedBSVs
+                geoPoints[index].bsv = geoPoints[index].bsv.toFixed(8);
                 localGeoPoints.push(geoPoints[index])
                 alert(`Maplock liked: ${t}`);
                 addMarker(index, 0)
@@ -368,7 +369,7 @@
         var northEast = bounds.getNorthEast();
         var southWest = bounds.getSouthWest();
         geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
-        geoPoints = geoPoints.concat(localGeoPoints)  // add locally stored geo points
+        geoPoints = localGeoPoints.concat(geoPoints)  // add locally stored geo points
         pointsToMarkers()
     }
 
