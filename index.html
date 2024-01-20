@@ -338,7 +338,7 @@
 
         let rawtx = lockLike(localStorage.walletAddress, lockHeight, satoshis, null, txid, null);
         if (rawtx) {
-            const c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight} blocks)?`);
+            const c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight - currentHeight} blocks)?`);
             if (c) {
                 map.closePopup();
                 rawtx = await payForRawTx(rawtx)
