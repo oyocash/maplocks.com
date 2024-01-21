@@ -291,6 +291,7 @@
         // for (let i = geoPoints.length - 1; i >=0; i--) {
             if (geoPoints[i].satoshis) {
                 geoPoints[i].bsv = geoPoints[i].satoshis / 100000000
+                geoPoints[i].bsv = geoPoints[i].bsv.toFixed(8);
             }
             if (typeof geoPoints[i].coordinates === 'string' || geoPoints[i].coordinates instanceof String) {
                 geoPoints[i].coordinates = JSON.parse(geoPoints[i].coordinates)
@@ -316,11 +317,15 @@
                 map.closePopup();
                 rawtx = await payForRawTx(rawtx)
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
-                addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
-                alert(`Maplock added: ${t}`);
-                geoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
-                localGeoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
-                addMarker(geoPoints.length - 1)
+                if (t.length === 64) {
+                    addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
+                    alert(`Maplock added: ${t}`);
+                    geoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
+                    localGeoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
+                    addMarker(geoPoints.length - 1)
+                } else {
+                    alert(t)
+                }
             } else { return }
         } 
     }
@@ -343,24 +348,30 @@
                 map.closePopup();
                 rawtx = await payForRawTx(rawtx)
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
-                const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
-                addTx(tx);
-                let localGeoPointsIndex = null;
-                for (let i = 0; i < localGeoPoints.length; i++) {
-                    if (localGeoPoints[i].txid === geoPoints[index].txid) {
-                        localGeoPointsIndex = i
-                        localGeoPoints[i].bsv += lockedBSVs
-                        localGeoPoints[i].bsv = localGeoPoints[i].bsv.toFixed(8);
-                        break
+                if (t.length === 64) {
+                    const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
+                    addTx(tx);
+                    let localGeoPointsIndex = null;
+                    for (let i = 0; i < localGeoPoints.length; i++) {
+                        if (localGeoPoints[i].txid === geoPoints[index].txid) {
+                            localGeoPointsIndex = i
+                            localGeoPoints[i].bsv = parseFloat(localGeoPoints[i].bsv) + parseFloat(lockedBSVs)
+                            localGeoPoints[i].bsv = localGeoPoints[i].bsv.toFixed(8);
+                            localGeoPoints[i].satoshis += satoshis
+                            break
+                        }
                     }
+                    if (localGeoPointsIndex === null) {
+                        geoPoints[index].bsv = parseFloat(geoPoints[index].bsv) + parseFloat(lockedBSVs)
+                        geoPoints[index].bsv = geoPoints[index].bsv.toFixed(8);
+                        geoPoints[index].satoshis += satoshis
+                        localGeoPoints.push(geoPoints[index])
+                    }
+                    alert(`Maplock liked: ${t}`);
+                    addMarker(index, 0)
+                } else {
+                    alert(t)
                 }
-                if (localGeoPointsIndex === null) {
-                    geoPoints[index].bsv += lockedBSVs
-                    geoPoints[index].bsv = geoPoints[index].bsv.toFixed(8);
-                    localGeoPoints.push(geoPoints[index])
-                }
-                alert(`Maplock liked: ${t}`);
-                addMarker(index, 0)
             } else { return }
         } 
     }
@@ -381,6 +392,7 @@
         var southWest = bounds.getSouthWest();
         geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
         geoPoints = localGeoPoints.concat(geoPoints)  // add locally stored geo points
+
         pointsToMarkers()
     }
 

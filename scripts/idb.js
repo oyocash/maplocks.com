@@ -79,7 +79,6 @@ const clearUTXOs = utxos => {
         const request = indexedDB.open('shuallet');
         request.onsuccess = e => {
             let db = e.target.result;
-            console.log('success');
             const tx = db.transaction('utxos', 'readwrite');
             const store = tx.objectStore('utxos');
             const reqDelete = store.clear();
@@ -94,7 +93,6 @@ const clearUTXOs = utxos => {
 
 const addTx = tx => {
     if (idb) {
-        console.log(tx)
         const request = indexedDB.open('shuallet');
         request.onsuccess = e => {
             console.log('adding tx...');
