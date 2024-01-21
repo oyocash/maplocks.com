@@ -216,6 +216,7 @@
     }
 
     const addMarker = (i, addCollision = 1) => {
+        console.log(JSON.stringify(geoPoints[i]))
         var iconStyle;
         if (geoPoints[i].bsv === 0.00000001) iconStyle = bit00000001Icon; else
         if (geoPoints[i].bsv < 0.001) iconStyle = bit0001Icon; else
@@ -291,7 +292,7 @@
         // for (let i = geoPoints.length - 1; i >=0; i--) {
             if (geoPoints[i].satoshis) {
                 geoPoints[i].bsv = geoPoints[i].satoshis / 100000000
-                geoPoints[i].bsv = geoPoints[i].bsv.toFixed(8);
+                geoPoints[i].bsv = parseFloat(geoPoints[i].bsv.toFixed(8));
             }
             if (typeof geoPoints[i].coordinates === 'string' || geoPoints[i].coordinates instanceof String) {
                 geoPoints[i].coordinates = JSON.parse(geoPoints[i].coordinates)
@@ -314,7 +315,6 @@
         if (rawtx) {
             const c = confirm(`Add location "${document.getElementById('newPointCoordinates').value}"?`);
             if (c) {
-                map.closePopup();
                 rawtx = await payForRawTx(rawtx)
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
                 if (t.length === 64) {
@@ -326,6 +326,7 @@
                 } else {
                     alert(t)
                 }
+                map.closePopup();
             } else { return }
         } 
     }
