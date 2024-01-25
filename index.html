@@ -21,8 +21,9 @@
         <script src="/scripts/Leaflet.LayerGroup.Collision.js"></script>
         <script src="/scripts/purify.min.js"></script>
 
-<script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
-<link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
+        <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <script src="https://unpkg.com/quill-image-compress@1.2.11/dist/quill.imageCompressor.min.js"></script>
 
         <link rel="stylesheet" href="/styles/L.Control.Sidebar.css" />
         <script src="/scripts/L.Control.Sidebar.js"></script>
@@ -561,10 +562,19 @@
 
                     sidebar.setContent(contentUserMarkerTooltip);
                     sidebar.show();
+
+                    Quill.register("modules/imageCompressor", imageCompressor);
                     var quill = new Quill('#editor-container', {
                         modules: {
                           syntax: false,
-                          toolbar: '#toolbar-container'
+                          toolbar: '#toolbar-container',
+                          imageCompressor: {
+                            quality: 0.9,
+                            maxWidth: 1000, // default
+                            maxHeight: 1000, // default
+                            imageType: 'image/jpeg',
+                            keepImageTypes: ['image/jpeg', 'image/png', 'image/gif']
+                          }
                         },
                         placeholder: 'Point description',
                         theme: 'snow'
