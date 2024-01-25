@@ -350,7 +350,7 @@
                     addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
                     alert(`Maplock added: ${t}`);
                     geoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
-                    localGeoPoints.push({txid: t, name: document.getElementById('newPointName').value, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
+                    localGeoPoints.push({txid: t, name: document.getElementById('newPointName').value, content: document.querySelector(".ql-editor").innerHTML, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
                     addMarker(geoPoints.length - 1)
                 } else {
                     alert(t)
