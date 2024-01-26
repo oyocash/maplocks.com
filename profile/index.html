@@ -84,27 +84,25 @@
             }
         </style>
     </head>
+    <body>
+        <div class="btns center" id="shlogin">
+            <a href="/">Back to maplocks</a>
+            <div id="walletAddress" class="wallet-address"></div>
+            <div id="qrcode"></div>
+            <div id="walletBalance" class="wallet-balance"></div>
+            <div class="create-wallet">
+                <button onclick="setupWallet()">Create or import SHUAllet</button>
+            </div>
+            <div class="backup-wallet">
+                <button onclick="backupWallet()">Backup Wallet</button>
+                <button onclick="sendBSV()">Send</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <input type="file" id="uploadFile" accept=".json" hidden>
+    </body>
 </html>
-<body>
-    <div class="btns center" id="shlogin">
-        <a href="/">Back to maplocks</a>
-        <div id="walletAddress" class="wallet-address"></div>
-        <div id="qrcode"></div>
-        <div id="walletBalance" class="wallet-balance"></div>
-        <div class="create-wallet">
-            <button onclick="setupWallet()">Create or import SHUAllet</button>
-        </div>
-        <div class="backup-wallet">
-            <button onclick="backupWallet()">Backup Wallet</button>
-            <button onclick="sendBSV()">Send</button>
-            <button onclick="logout()">Logout</button>
-        </div>
-    </div>
-    <input type="file" id="uploadFile" accept=".json" hidden>
-</body>
 <script src="/scripts/SHUAllet.js"></script>
-<script src="/scripts/oneSatOrdinals.js"></script>
-<script src="/scripts/bsv20.js"></script>
 
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function() {
