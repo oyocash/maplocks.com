@@ -94,10 +94,10 @@
         return vars;
     }
 
-    const getUserMaplocks = async (address, skip) => {
-        const r = await fetch(`${dataURL}getUserMaplocks/`, {
+    const getUserLikes = async (address, app, skip) => {
+        const r = await fetch(`${dataURL}getMaplockUserLikes/`, {
             method: 'post',
-            body: JSON.stringify({ address, skip })
+            body: JSON.stringify({ address, app, skip })
         })
         const res = await r.text();
         return JSON.parse(res);
@@ -110,15 +110,17 @@
     if (isNaN(skipParam)) skipParam = 0;
 
     if(userAddressParam === localStorage.walletAddress) {
-        document.getElementById('title').innerHTML = "<h3>My locations</h3>";
+        document.getElementById('title').innerHTML = "<h3>My likes</h3>";
     } else {
-        document.getElementById('title').innerHTML = `<h3>Locations added by ${userAddressParam}</h3>`;
+        document.getElementById('title').innerHTML = `<h3>Liked by ${userAddressParam}</h3>`;
     }
 
     (async () => {
-        let data = await getUserMaplocks(userAddressParam, skipParam)
+        let data = await getUserLikes(userAddressParam, "maplocks.com", skipParam)
         let divHTML = ""
+        console.log(JSON.stringify(data))
         for (let i = 0; i < data.length; i++) {
+            if (data[i].txid === null || data[i].name === null || data[i].coordinates === null) continue;
             const coordinates = JSON.parse(data[i].coordinates)
             divHTML += `<li class="item"><a href="/?latit=${coordinates[0]}&longit=${coordinates[1]}">${data[i].name}</a> - ${data[i].satoshis / 100000000} BSV</li>`
         }
