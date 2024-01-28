@@ -462,10 +462,7 @@
         longit = getUrlVars()["longit"]
 
         if (latit === null || latit === undefined || longit === null || longit === undefined) {
-            await getLocationFromIP()
-            if (latit === null || latit === undefined || longit === null || longit === undefined) {
-                latit = 0; longit = 0;
-            }
+            latit = 0; longit = 0;
             if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(function(position) {
                 latit = position.coords.latitude;
@@ -523,6 +520,11 @@
         // add collision layer
         collisionLayer = L.LayerGroup.collision({margin:15});
         collisionLayer.addTo(map);
+
+        if (latit === 0 && longit === 0 && getUrlVars()["latit"] !== 0 && getUrlVars()["latit"] !== 0) {
+            await getLocationFromIP()
+            map.panTo(new L.LatLng(latit, longit));
+        }
 
         map.on('moveend', async function() {
             populatePoints()

@@ -80,6 +80,7 @@
             <ul class="item-list" id="items"></ul>
         </div>
 
+        <div class="text-block" id="next"></div>
     </div>
 </body>
 </html>
@@ -125,5 +126,13 @@
             divHTML += `<li class="item"><a href="/?latit=${coordinates[0]}&longit=${coordinates[1]}">${data[i].name}</a> - ${data[i].satoshis / 100000000} BSV</li>`
         }
         document.getElementById('items').innerHTML = divHTML;
+        if (skip > 0) {
+          const prevSkip = skip - 50;
+          if (prevSkip < 0) prevSkip = 0;
+          document.getElementById('next').innerHTML = `<a href="/user/likes.html?address=${address}&skip=${prevSkip}">Previews</a>`;
+        }
+        if (data.length === 50) {
+          document.getElementById('next').innerHTML = `<a href="/user/likes.html?address=${address}&skip=${skipParam+50}">Next</a>`;
+        }
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 </script>
