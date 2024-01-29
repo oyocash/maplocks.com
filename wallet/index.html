@@ -87,8 +87,19 @@
     <body>
         <div class="btns center" id="shlogin">
             <a href="/">Back to maplocks</a>
-            <p><a href="/user/locations.html">My locations</a></p>
-            <p><a href="/user/likes.html">My likes</a></p>
+            <div id="walletAddress" class="wallet-address"></div>
+            <div id="qrcode"></div>
+            <div id="walletBalance" class="wallet-balance"></div>
+            <div class="create-wallet">
+                <button onclick="setupWallet()">Create or import SHUAllet</button>
+            </div>
+            <div class="backup-wallet">
+                <button onclick="backupWallet()">Backup Wallet</button>
+                <button onclick="sendBSV()">Send</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <input type="file" id="uploadFile" accept=".json" hidden>
     </body>
 </html>
 <script src="/scripts/SHUAllet.js"></script>
