@@ -616,9 +616,9 @@
         latit = getUrlVars()["latit"]
         longit = getUrlVars()["longit"]
 
-        if (!getUrlVars()["txid"] && (latit === null || latit === undefined || longit === null || longit === undefined)) {
+        if (latit === null || latit === undefined || longit === null || longit === undefined) {
             latit = 0; longit = 0;
-            if (navigator.geolocation) {
+            if (!getUrlVars()["txid"] || navigator.geolocation) {
                 try {
                     position = await getCoords();
                     latit = position.lat
