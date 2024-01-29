@@ -187,6 +187,17 @@
                 font-size: 16px;
                 color: rgb(17, 24, 39);
             }
+            .popupForm textarea {
+                border-radius: 12px;
+                border: 1px solid rgb(209, 213, 219);
+                background: rgb(249, 250, 251);
+                padding: 10px; 
+                width: 95%;
+                height: 150px;
+                font-family: RobotoFlex;
+                font-size: 16px;
+                color: rgb(17, 24, 39);
+            }
             .popupForm button {
                 background-color: rgba(0, 0, 0, 0);
                 background-image: linear-gradient(to right bottom, rgb(253, 186, 140), rgb(208, 56, 1));
@@ -271,6 +282,7 @@
 
     var geoPoints = []
     var localGeoPoints = []
+    var localComments = {}
     var userMarker;
     var latit = null;
     var longit = null;
@@ -309,7 +321,6 @@
         var marker = L.marker(geoPoints[i].coordinates, {icon: iconStyle})
         .bindTooltip(popupName, {permanent: true, direction : 'bottom', className: 'transparent-tooltip', offset: [0, -15]})
         .addTo(markerLayerGroup)
-        // marker.bindPopup(content);
         if (addCollision) {
             collisionLayer.addLayer(marker);
         }
@@ -334,6 +345,12 @@
             if (resultJSON !== undefined && resultJSON.length > 0 && resultJSON[0].content !== undefined) contentHTML = resultJSON[0].content
         }
         contentHTML = DOMPurify.sanitize(contentHTML)
+
+        let commentHTML = ""
+        let comments = await getComments(geoPoints[i].txid, 0)
+        if (comments !== undefined && comments.length > 0) {
+            // write comments logic here
+        }
 
         var content = `
             <a target="_blank" rel="noopener noreferrer" class="woc-icon" href="https://whatsonchain.com/tx/${geoPoints[i].txid}"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" class="text-black dark:text-white mt-0 mr-0 w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M856 376H648V168c0-8.8-7.2-16-16-16H168c-8.8 0-16 7.2-16 16v464c0 8.8 7.2 16 16 16h208v208c0 8.8 7.2 16 16 16h464c8.8 0 16-7.2 16-16V392c0-8.8-7.2-16-16-16zm-480 16v188H220V220h360v156H392c-8.8 0-16 7.2-16 16zm204 52v136H444V444h136zm224 360H444V648h188c8.8 0 16-7.2 16-16V444h156v360z"></path></svg></a>
@@ -365,7 +382,28 @@
                     <span class="locationTab" id="commentsTab"><a onclick="showComments()">Comments</a></span>
                 </div>
                 <div class="tooltip-bigContent" id="markerOverview">${contentHTML}</div>
-                <div class="tooltip-bigContent" id="markerComments"></div>
+                <div class="tooltip-bigContent" id="markerComments">
+                    <div class="tooltip-content" id="commentFormLink"><a onclick="showCommentForm()">Make a comment</a></div>
+
+                    <div style="display:none" id="commentForm">
+                        <input id="commentedTxid" type="text" name="txid" value="${geoPoints[i].txid}" hidden>
+                        <div class="tooltip-content popupForm"><textarea id="newCommentContent" placeholder="Make a comment"></textarea></div>
+
+                        <div class="tooltip-content popupForm">
+                            Expires in: 
+                            <select id="commentLockBlocks" name="blocks" type="number">
+                                <option value="6">1 hour</option>
+                                <option value="144">1 day</option>
+                                <option value="1008">7 days</option>
+                                <option value="10950">30 days</option>
+                                <option value="52560">1 year</option>
+                                <option value="52560000" selected="selected">Never</option>
+                            </select> 
+                            <span styles="width:50%">&nbsp;</span>
+                            <button id="newComment" onclick="addComment()">Comment</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             `           
 
@@ -388,6 +426,11 @@
         document.getElementById('commentsTab').classList.add('locationTabActive');
     }
 
+    const showCommentForm = () => {
+        document.getElementById('commentForm').style.display = 'block';
+        document.getElementById('commentFormLink').style.display = 'none';
+    }
+
     const pointsToMarkers = async () => {
         markerLayerGroup.clearLayers()
         collisionLayer.clearLayers()
@@ -405,7 +448,8 @@
 
     const addCoordinates = async() => {
         if (!localStorage.walletAddress) {
-            window.location.href = '/profile/';
+            alert("You must have a wallet to add locations")
+            window.location.href = '/wallet/';
         }
 
         const currentHeight = await getBlock();
@@ -477,6 +521,49 @@
                 }
             } else { return }
         } 
+    }
+
+    const addComment = async () => {
+        if (!localStorage.walletAddress) {
+            alert("You must have a wallet to make comments")
+            window.location.href = '/wallet/';
+        }
+
+        const currentHeight = await getBlock();
+        let repliedTxid = document.getElementById('commentedTxid').value
+        let lockHeight = parseInt(currentHeight) + parseInt(document.getElementById('commentLockBlocks').value);
+        let satoshis = 1;
+        let content = document.getElementById('newCommentContent').value;
+
+        let rawtx = lockPost(localStorage.walletAddress, lockHeight, satoshis, null, content, repliedTxid);
+        if (rawtx) {
+            const c = confirm(`Add comment "${content}"?`);
+            if (c) {
+                rawtx = await payForRawTx(rawtx)
+                // const t = await broadcast(rawtx, true, localStorage.walletAddress);
+                const t = "aa0bfcfe142436bd33ac7b232efdf0ab7d870a5241ca0bc1d9fea3bf77d9ae25" // dummy t
+                if (t.length === 64) {
+                    // addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
+                    alert(`Comment added: ${t}`);
+                    if (localComments[repliedTxid] === undefined) localComments[repliedTxid] = [];
+                    localComments[repliedTxid].push({txid: t, address: address, content: content, satoshis: satoshis, bsv: (satoshis / 100000000), txTimestamp: Date.now()})
+                } else {
+                    alert(t)
+                }
+                sidebar.hide();
+            } else { return }
+        } 
+    }
+
+    const getComments = async (txid, skip) => {
+        const r = await fetch(`${dataURL}getPostReplies/`, {
+            method: 'post',
+            body: JSON.stringify({ txid, skip })
+        })
+        const res = await r.text();
+        console.log(res)
+        if (localComments[txid] === undefined) return JSON.parse(res);
+        return localComments[txid].concat(JSON.parse(res));
     }
 
     const getGeoPoints = async (northEastLat, northEastLng, southWestLat, southWestLng) => {
@@ -612,8 +699,7 @@
             } else {
                 userMarker = new L.Marker([e.latlng.lat, e.latlng.lng], {icon: bitWhiteIcon}).addTo(map);
                 var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
-                    <div class="tooltip-content">[${e.latlng.lat}, ${e.latlng.lng}]</div>
-                    <input type="point" id="newPointCoordinates" value="[${e.latlng.lat}, ${e.latlng.lng}]" hidden>
+                    <div class="tooltip-content popupForm"><input type="point" id="newPointCoordinates" class="long" value="[${e.latlng.lat}, ${e.latlng.lng}]"></div>
                     <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="name" placeholder="name"></div>
                     <div class="tooltip-content popupForm">
                         <div id="standalone-container">
