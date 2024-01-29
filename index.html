@@ -616,7 +616,7 @@
         latit = getUrlVars()["latit"]
         longit = getUrlVars()["longit"]
 
-        if (latit === null || latit === undefined || longit === null || longit === undefined) {
+        if (!getUrlVars()["txid"] && (latit === null || latit === undefined || longit === null || longit === undefined)) {
             latit = 0; longit = 0;
             if (navigator.geolocation) {
                 try {
@@ -675,7 +675,7 @@
         collisionLayer = L.LayerGroup.collision({margin:15});
         collisionLayer.addTo(map);
 
-        if (latit === 0 && longit === 0 && getUrlVars()["latit"] !== 0 && getUrlVars()["longit"] !== 0) {
+        if (!getUrlVars()["txid"] && latit === 0 && longit === 0 && getUrlVars()["latit"] !== 0 && getUrlVars()["longit"] !== 0) {
             try {
                 await getLocationFromIP()
                 map.panTo(new L.LatLng(latit, longit));
@@ -772,6 +772,8 @@
                 showMarkerSidebar(geoPoints.length - 1)
                 map.panTo(new L.LatLng(JSON.parse(resultJSON[0].coordinates)[0], JSON.parse(resultJSON[0].coordinates)[1]));
                 populatePoints();
+            } else {
+                alert("The location cannot be found")
             }
         }
     })().catch(e => console.log("Caught: " + e)); // Catches it.
