@@ -23,6 +23,9 @@
         <link rel="stylesheet" href="/styles/L.Control.Sidebar.css" />
         <script src="/scripts/L.Control.Sidebar.js"></script>
 
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+        <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+
         <script src="/scripts/leaflet-color-markers.js"></script>
         <link href="/styles/shuallet.css" rel="stylesheet" type="text/css">
         <script src="/scripts/bsv.browser.min.js"></script>
@@ -56,15 +59,6 @@
               padding: 10px;
               z-index: 400;
             }
-            #profileButton {
-              position: absolute;
-              top: 95px;
-              right: 10px;
-              padding: 0px;
-              z-index: 400;
-              display: none;
-              cursor: pointer;
-            }
             .leaflet-container a.woc-icon {
                 position: absolute;
                 top: 0px;
@@ -78,7 +72,6 @@
                 color: #757575;
                 text-decoration: none;
                 background: transparent;
-                cursor:pointer;
             }
             .leaflet-container a.share-icon {
                 position: absolute;
@@ -93,7 +86,6 @@
                 color: #757575;
                 text-decoration: none;
                 background: transparent;
-                cursor:pointer;
             }
             .transparent-tooltip {
               -webkit-text-stroke: 0.4px white; /* width and color */
@@ -245,7 +237,6 @@
                 text-decoration: underline;
             }
             .locationTab a {
-                cursor:pointer;
                 font-size: 17px;
                 font-weight: bold;
             }
@@ -317,11 +308,17 @@
                 vertical-align: bottom;
             }
             .commentItem .buttons a {
-                cursor: pointer;
                 color: #757575;
             }
             .likeCommentForm {
                 display: none;
+            }
+            img.leaflet_button {
+                text-align: center;
+                padding-top: 3px;
+            }
+            a {
+                cursor:pointer;
             }
         </style>
 
@@ -337,8 +334,6 @@
             <img src="/assets/shuacoin.png" class="shuapng">
             <span class="btn-text">SHUAllet</span>
         </button>
-        <button id="profileButton" onclick="location.href='/profile/';"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30px" height="30px" viewBox="0 0 30 30" version="1.1"><rect width="100%" height="100%" fill="white" /><g id="surface1"><path style=" stroke:none;fill-rule:nonzero;fill:rgb(6.6%,6.6%,6.6%);fill-opacity:1;" d="M 14.910156 0.0429688 C 6.695312 0.09375 0.0625 6.78125 0.0898438 15 C 0.113281 23.21875 6.78125 29.867188 15 29.867188 C 23.21875 29.867188 29.886719 23.21875 29.910156 15 C 29.9375 6.78125 23.304688 0.09375 15.089844 0.0429688 Z M 14.910156 7.632812 C 18.597656 7.679688 21.554688 10.695312 21.527344 14.382812 C 21.503906 18.066406 18.511719 21.042969 14.824219 21.042969 C 11.136719 21.042969 8.140625 18.066406 8.117188 14.382812 C 8.09375 10.695312 11.050781 7.679688 14.734375 7.632812 Z M 5.03125 25.324219 C 6.617188 23.265625 8.589844 22.234375 10.941406 22.234375 L 19.058594 22.234375 C 21.410156 22.234375 23.382812 23.265625 24.96875 25.324219 C 19.382812 30.632812 10.617188 30.632812 5.03125 25.324219 "/></g></svg>
-</button>
       </div>
       <div id="bars"></div>
       <div id="sidebar"></div>
@@ -796,6 +791,21 @@
           lat: pos.coords.latitude,
         };
     };
+    const addUserMarker = (lat, lng) => {
+        if (sidebar.isVisible()) {
+            sidebar.hide();
+            return
+        }
+        sidebar.hide();
+
+        if (userMarker) { // check
+           map.removeLayer(userMarker); // remove old layers
+           userMarker = null;
+        } else {
+            userMarker = new L.Marker([lat, lng], {icon: bitWhiteIcon}).addTo(map);
+            userMarker.bindPopup(`<a onclick="showUserMarkerSidebar(${lat}, ${lng})">Add this location</a>`).openPopup();
+        }  
+    }
     const showUserMarkerSidebar = async (lat,lng) => {
         var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
             <div class="tooltip-content popupForm"><input type="point" id="newPointCoordinates" class="long" value="[${lat}, ${lng}]"></div>
@@ -913,6 +923,20 @@
         collisionLayer = L.LayerGroup.collision({margin:15});
         collisionLayer.addTo(map);
 
+        // add buttons
+        L.easyButton('<img src="/assets/icon-target.svg" class="leaflet_button" width=22 height=22>', async function(btn, map){
+            var position = await getCoords();
+            latit = position.lat
+            longit = position.long
+            map.setView([latit, longit]);
+            addUserMarker(latit, longit)
+        }).addTo(map);
+        if (localStorage.walletAddress) {
+            L.easyButton('<img src="/assets/icon-profile-user.svg" class="leaflet_button" width=22 height=22>', function(btn, map){
+                window.location.href='/profile/';
+            }).addTo(map);
+        }
+
         sidebar.on('hidden', function () {
             map.removeLayer(userMarker); // remove old layer
         });
@@ -929,26 +953,11 @@
             populatePoints()
         });
         map.on('click', function (e) {
-            if (sidebar.isVisible()) {
-                sidebar.hide();
-                return
-            }
-            sidebar.hide();
-
-            if (userMarker) { // check
-               map.removeLayer(userMarker); // remove old layers
-               userMarker = null;
-            } else {
-                userMarker = new L.Marker([e.latlng.lat, e.latlng.lng], {icon: bitWhiteIcon}).addTo(map);
-                userMarker.bindPopup(`<a onclick="showUserMarkerSidebar(${e.latlng.lat}, ${e.latlng.lng})">Add this location</a>`).openPopup();
-            }  
+            addUserMarker(e.latlng.lat, e.latlng.lng)
         });
     }
 
     (async () => {
-        if (localStorage.walletAddress) {
-            document.getElementById('profileButton').style.display = 'block';
-        }
         await populateMap()
         if (getUrlVars()["txid"]) {
             const result = await fetch(`${dataURL}getMaplock/${getUrlVars()["txid"]}`)
