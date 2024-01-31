@@ -9,7 +9,7 @@ const initSHUAlletDB = () => {
             }
             if (!db.objectStoreNames.contains('txs')) {
                 let txs = db.createObjectStore('txs', { keyPath: 'txid' });
-                txs.createIndex('height_idx', 'height');
+                // txs.createIndex('height_idx', 'height');
             }
             console.log(`upgrading to version ${e.newVersion}`);
         }
@@ -91,15 +91,15 @@ const clearUTXOs = utxos => {
     }
 }
 
-const addTx = tx => {
+const addTx = txо => {
     if (idb) {
         const request = indexedDB.open('shuallet');
         request.onsuccess = e => {
             console.log('adding tx...');
             let db = e.target.result;
-            const txs = db.transaction('txs', 'readwrite');
-            const table = txs.objectStore('txs');
-            table.add(tx);
+            const tx = db.transaction('txs', 'readwrite');
+            const table = tx.objectStore('txs');
+            table.add(txо);
         }
         request.onerror = e => { console.log('error', e) }
     }
@@ -170,4 +170,7 @@ const addUnlockedTx = (txid) => {
 
 const listUnlockedTxs = () => {
     return JSON.parse(localStorage.getItem('unlockedTxs') || "[]");
+}
+const deleteDB = () => {
+    indexedDB.deleteDatabase('shuallet')
 }

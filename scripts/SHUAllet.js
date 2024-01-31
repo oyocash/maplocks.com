@@ -148,7 +148,7 @@ const setupWallet = async() => {
 }
 const backupWallet = () => {
     const a = document.createElement('a');
-    const obj = { ordPk: localStorage?.ownerKey, payPk: localStorage.walletKey };
+    const obj = { ordPk: localStorage?.ownerKey, payPk: localStorage.walletKey, identityPk: localStorage.walletKey };
     a.href = URL.createObjectURL( new Blob([JSON.stringify(obj)], { type: 'json' }))
     a.download = 'shuallet.json';
     a.click();
@@ -159,12 +159,19 @@ const sendBSV = async() => {
         if (amt === null) return;
         const satoshis = parseInt(parseFloat(amt) * 100000000);
         if (!satoshis) { throw `Invalid amount` }
+        const balance = await getWalletBalance();
+        if (balance < satoshis) { alert(`Amount entered exceeds balance`); throw `Amount entered exceeds balance`; }
+        const sendMax = balance === satoshis;
         const to = prompt(`Enter address to send BSV to:`);
         if (!to) { return }
         const addr = bsv.Address.fromString(to);
         if (addr) {
             const bsvtx = bsv.Transaction();
-            bsvtx.to(addr, satoshis);
+            if (sendMax) {
+                bsvtx.to(addr, satoshis - 1);
+            } else {
+                bsvtx.to(addr, satoshis);
+            }
             const rawtx = await payForRawTx(bsvtx.toString());
             if (rawtx) {
                 const c = confirm(`Send ${amt} BSV to ${addr}?`);
@@ -227,6 +234,7 @@ If so, please ensure your wallet is backed up first!`);
         localStorage.clear();
         clearUTXOs();
         clearTxs();
+        deleteDB();
         location.reload();
     }
 }

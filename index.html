@@ -218,7 +218,7 @@
             }
             .popupForm #editor-container {
                 width:100%;
-                height:70%;;
+                height:60%;
                 border-bottom-left-radius: 12px;
                 border-bottom-right-radius: 12px;
                 border: 1px solid rgb(209, 213, 219);
@@ -252,6 +252,77 @@
             #markerComments {
                 display: none;
             }
+            .commentItem {
+                border: 1px solid rgb(209, 213, 219);
+                border-radius: 8px;
+                margin-top:8px;
+            }
+            .commentItem .top {
+                color: #000;
+                display: flex;
+                font-family: RobotoFlex;
+                justify-content: space-between;
+                line-height: 24px;
+                padding-bottom: 4px;
+                padding-left: 8px;
+                padding-right: 8px;
+                padding-top: 12px
+            }
+            .commentItem .address {
+                color: #000;
+                display: block;
+                font-family: RobotoFlex;
+                font-weight: 600;
+                line-height: 20px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 35%;
+            }
+            .commentItem .address a {
+                color: #000;
+                text-decoration: underline;
+            }
+            .commentItem .timestamp {
+                color: rgb(75, 85, 99);
+                display: block;
+                font-family: RobotoFlex;
+                font-size: 14px;
+                line-height: 20px;
+                padding-left: 8px;
+            }
+            .commentItem .comment {
+                color: rgb(0, 0, 0);
+                font-family: RobotoFlex;
+                line-height: 24px;
+                margin-left: 8px;
+                margin-bottom: 5px;
+                overflow-x: auto;
+                overflow-y: auto;
+                padding-bottom: 0px;
+                padding-left: 12px;
+                padding-right: 12px;
+                max-height: 200px;
+                text-align: left;
+            }
+            .commentItem .buttons {
+                line-height: 24px;
+                margin-left: 8px;
+                margin-bottom: 5px;
+                padding-bottom: 0px;
+                padding-left: 12px;
+                padding-right: 12px;
+                text-align: left;
+            }
+            .commentItem .commentButton {
+                vertical-align: bottom;
+            }
+            .commentItem .buttons a {
+                cursor: pointer;
+                color: #757575;
+            }
+            .likeCommentForm {
+                display: none;
+            }
         </style>
 
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -282,6 +353,7 @@
 
     var geoPoints = []
     var localGeoPoints = []
+    var comments = [];
     var localComments = {}
     var userMarker;
     var latit = null;
@@ -295,6 +367,39 @@
       });
       return vars;
     }
+
+    const timeAgo = (date) => {
+      const seconds = Math.floor((new Date() - date) / 1000);
+
+      let interval = Math.floor(seconds / 31536000);
+      if (interval > 1) {
+        return interval + ' years ago';
+      }
+
+      interval = Math.floor(seconds / 2592000);
+      if (interval > 1) {
+        return interval + ' months ago';
+      }
+
+      interval = Math.floor(seconds / 86400);
+      if (interval > 1) {
+        return interval + ' days ago';
+      }
+
+      interval = Math.floor(seconds / 3600);
+      if (interval > 1) {
+        return interval + ' hours ago';
+      }
+
+      interval = Math.floor(seconds / 60);
+      if (interval > 1) {
+        return interval + ' minutes ago';
+      }
+
+      if(seconds < 10) return 'just now';
+
+      return Math.floor(seconds) + ' seconds ago';
+    };
 
     const addMarker = (i, addCollision = 1) => {
         var iconStyle;
@@ -336,22 +441,6 @@
         var tooltipName = geoPoints[i].name.replace(/<[^>]+>/g, '');
         tooltipName = tooltipName.replace(/(.{23}[^ ]* )/g, "$1<br />");
 
-        var contentHTML = ""
-        if (geoPoints[i].content !== undefined && geoPoints[i].content.length > 0) {
-            contentHTML = geoPoints[i].content
-        } else {
-            const result = await fetch(`${dataURL}getMaplock/${geoPoints[i].txid}`)
-            const resultJSON = await result.json()
-            if (resultJSON !== undefined && resultJSON.length > 0 && resultJSON[0].content !== undefined) contentHTML = resultJSON[0].content
-        }
-        contentHTML = DOMPurify.sanitize(contentHTML)
-
-        let commentHTML = ""
-        let comments = await getComments(geoPoints[i].txid, 0)
-        if (comments !== undefined && comments.length > 0) {
-            // write comments logic here
-        }
-
         var content = `
             <a target="_blank" rel="noopener noreferrer" class="woc-icon" href="https://whatsonchain.com/tx/${geoPoints[i].txid}"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" class="text-black dark:text-white mt-0 mr-0 w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M856 376H648V168c0-8.8-7.2-16-16-16H168c-8.8 0-16 7.2-16 16v464c0 8.8 7.2 16 16 16h208v208c0 8.8 7.2 16 16 16h464c8.8 0 16-7.2 16-16V392c0-8.8-7.2-16-16-16zm-480 16v188H220V220h360v156H392c-8.8 0-16 7.2-16 16zm204 52v136H444V444h136zm224 360H444V648h188c8.8 0 16-7.2 16-16V444h156v360z"></path></svg></a>
             <a class="share-icon" onclick="copyLinkToClipboard('${geoPoints[i].txid}')"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-black dark:text-white" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M8 9h-1a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-8a2 2 0 0 0 -2 -2h-1"></path><path d="M12 14v-11"></path><path d="M9 6l3 -3l3 3"></path></svg></a>
@@ -379,9 +468,9 @@
 
                 <div class="tooltip-content tabs">
                     <span class="locationTab locationTabActive" id="overviewTab"><a onclick="showOverview()">Overview</a></span>
-                    <span class="locationTab" id="commentsTab"><a onclick="showComments()">Comments</a></span>
+                    <span class="locationTab" id="commentsTab"><a onclick="showComments(${i})">Comments</a></span>
                 </div>
-                <div class="tooltip-bigContent" id="markerOverview">${contentHTML}</div>
+                <div class="tooltip-bigContent" id="markerOverview"></div>
                 <div class="tooltip-bigContent" id="markerComments">
                     <div class="tooltip-content" id="commentFormLink"><a onclick="showCommentForm()">Make a comment</a></div>
 
@@ -400,35 +489,58 @@
                                 <option value="52560000" selected="selected">Never</option>
                             </select> 
                             <span styles="width:50%">&nbsp;</span>
-                            <button id="newComment" onclick="addComment()">Comment</button>
+                            <button id="newComment" onclick="addComment(${i})">Comment</button>
                         </div>
                     </div>
+
+                    <div class="tooltip-content" id="commentsList"></div>
                 </div>
             </div>
-            `           
-
+            `
 
         sidebar.setContent(content);
         sidebar.show();
+        populateSidebarContent(i)
     }
 
+    const populateSidebarContent = async (i) => {
+        var contentHTML = ""
+        if (geoPoints[i].content !== undefined && geoPoints[i].content.length > 0) {
+            contentHTML = geoPoints[i].content
+        } else {
+            const result = await fetch(`${dataURL}getMaplock/${geoPoints[i].txid}`)
+            const resultJSON = await result.json()
+            if (resultJSON !== undefined && resultJSON.length > 0 && resultJSON[0].content !== undefined) contentHTML = resultJSON[0].content
+        }
+        contentHTML = DOMPurify.sanitize(contentHTML)
+        document.getElementById('markerOverview').innerHTML = contentHTML;
+    }
     const showOverview = () => {
         document.getElementById('markerOverview').style.display = 'block';
         document.getElementById('markerComments').style.display = 'none';
         document.getElementById('overviewTab').classList.add('locationTabActive');
         document.getElementById('commentsTab').classList.remove('locationTabActive');
     }
-
-    const showComments = () => {
+    const showComments = (index) => {
         document.getElementById('markerOverview').style.display = 'none';
         document.getElementById('markerComments').style.display = 'block';
         document.getElementById('overviewTab').classList.remove('locationTabActive');
         document.getElementById('commentsTab').classList.add('locationTabActive');
+        getCommentsHTML(index)
     }
-
     const showCommentForm = () => {
         document.getElementById('commentForm').style.display = 'block';
         document.getElementById('commentFormLink').style.display = 'none';
+    }
+    const hideCommentForm = () => {
+        document.getElementById('commentForm').style.display = 'none';
+        document.getElementById('commentFormLink').style.display = 'block';
+    }
+    const showLikeCommentForm = (index) => {
+        document.getElementById('likeCommentForm_' + index).style.display = 'block';
+    }
+    const hideLikeCommentForm = (index) => {
+        document.getElementById('likeCommentForm_' + index).style.display = 'none';
     }
 
     const pointsToMarkers = async () => {
@@ -442,7 +554,8 @@
             if (typeof geoPoints[i].coordinates === 'string' || geoPoints[i].coordinates instanceof String) {
                 geoPoints[i].coordinates = JSON.parse(geoPoints[i].coordinates)
             }
-            let selectedMarker = addMarker(i, 0)
+            // let selectedMarker = addMarker(i, 0)
+            let selectedMarker = addMarker(i)
         }
     }
 
@@ -496,8 +609,7 @@
                 rawtx = await payForRawTx(rawtx)
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
                 if (t.length === 64) {
-                    const tx = {'txid': t, 'height': lockHeight, 'satoshis': satoshis};
-                    addTx(tx);
+                    addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
                     let localGeoPointsIndex = null;
                     for (let i = 0; i < localGeoPoints.length; i++) {
                         if (localGeoPoints[i].txid === geoPoints[index].txid) {
@@ -523,7 +635,7 @@
         } 
     }
 
-    const addComment = async () => {
+    const addComment = async (index) => {
         if (!localStorage.walletAddress) {
             alert("You must have a wallet to make comments")
             window.location.href = '/wallet/';
@@ -540,17 +652,48 @@
             const c = confirm(`Add comment "${content}"?`);
             if (c) {
                 rawtx = await payForRawTx(rawtx)
-                // const t = await broadcast(rawtx, true, localStorage.walletAddress);
-                const t = "aa0bfcfe142436bd33ac7b232efdf0ab7d870a5241ca0bc1d9fea3bf77d9ae25" // dummy t
+                const t = await broadcast(rawtx, true, localStorage.walletAddress);
                 if (t.length === 64) {
-                    // addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
+                    addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis})
                     alert(`Comment added: ${t}`);
                     if (localComments[repliedTxid] === undefined) localComments[repliedTxid] = [];
-                    localComments[repliedTxid].push({txid: t, address: address, content: content, satoshis: satoshis, bsv: (satoshis / 100000000), txTimestamp: Date.now()})
+                    localComments[repliedTxid].push({txid: t, address: localStorage.walletAddress, content: content, satoshis: satoshis, bsv: (satoshis / 100000000), txTimestamp: (Date.now()/1000)})
+                    
+                    hideCommentForm();
+                    document.getElementById('newCommentContent').value = ""
+                    getCommentsHTML(index)
                 } else {
                     alert(t)
                 }
-                sidebar.hide();
+            } else { return }
+        } 
+    }
+
+    const likeComment = async (index) => {
+        if (!localStorage.walletAddress) {
+            window.location.href = '/profile/';
+        }
+
+        const currentHeight = await getBlock();
+        const lockHeight = parseInt(currentHeight) + parseInt(document.getElementById(`likeCommentBlocks`).value);
+        const lockedBSVs = parseFloat(document.getElementById(`likeCommentCoins`).value)
+        let satoshis = parseInt(lockedBSVs * 100000000);
+        const txid = document.getElementById(`likeCommentTxid`).value;
+
+        let rawtx = lockLike(localStorage.walletAddress, lockHeight, satoshis, null, txid, null);
+        if (rawtx) {
+            const c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight - currentHeight} blocks)?`);
+            if (c) {
+                hideLikeCommentForm(index);
+                rawtx = await payForRawTx(rawtx)
+                const t = await broadcast(rawtx, true, localStorage.walletAddress);
+                if (t.length === 64) {
+                    addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis});
+                    comments[index].bsv = comments[index].bsv + lockedBSVs
+                    document.getElementById('likedCommentBSV_' + index).innerHTML = comments[index].bsv;
+                } else {
+                    alert(t)
+                }
             } else { return }
         } 
     }
@@ -564,6 +707,47 @@
         console.log(res)
         if (localComments[txid] === undefined) return JSON.parse(res);
         return localComments[txid].concat(JSON.parse(res));
+    }
+
+    const getCommentsHTML = async (index) => {
+        let commentHTML = ""
+        comments = await getComments(geoPoints[index].txid, 0)
+        if (comments !== undefined && comments.length > 0) {
+            for (let i = 0; i < comments.length; i++) {
+                comments[i].bsv = comments[i].satoshis / 100000000
+                comments[i].bsv = parseFloat(comments[i].bsv.toFixed(8));
+
+                commentHTML += `<div class="tooltip-content commentItem">
+                    <div class="top">
+                        <span class="address">${comments[i].address}</span>
+                        <span class="timestamp">${timeAgo(comments[i].txTimestamp*1000)}</span>
+                    </div>
+                    <div class="comment">${comments[i].content.replace(/(?:\r\n|\r|\n)/g, '<br>')}</div>
+
+                    <div class="buttons">
+                        <a onclick="showLikeCommentForm(${i})"><svg class="commentButton" stroke="currentColor" fill="none" stroke-linecap="round" stroke-width="1.5px" stroke-linejoin="round" role="img" viewBox="0 0 24 24" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg" styles="padding-top:5px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12.5 21h-5.5a2 2 0 0 1 -2 -2v-6a2 2 0 0 1 2 -2h10a2 2 0 0 1 1.74 1.012"></path><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"></path><path d="M8 11v-4a4 4 0 1 1 8 0v4"></path><path d="M16 19h6"></path><path d="M19 16v6"></path></svg></a>
+                        <span id="likedCommentBSV_${i}">${comments[i].bsv}</span><svg stroke="currentColor" fill="currentColor" stroke-width="0" role="img" viewBox="0 0 24 24" class="coinIcon" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><title></title><path d="M14.648 14.423l.003-.004a1.34 1.34 0 0 1-.498.659c-.269.189-.647.338-1.188.364l-1.99.004v-2.93c.288.008 1.565-.013 2.119.015.722.035 1.171.321 1.41.668.262.351.293.82.144 1.224zm-2.129-3.261c.503-.024.852-.162 1.101-.336.214-.146.375-.367.46-.611.134-.375.107-.81-.136-1.135-.223-.319-.638-.584-1.306-.616-.495-.026-1.413-.003-1.664-.01v2.709c.025.004 1.539-.001 1.545-.001zM24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-6.65 2.142c.022-1.477-1.24-2.332-1.908-2.572.715-.491 1.206-1.043 1.206-2.085 0-1.655-1.646-2.43-2.647-2.529-.082-.009-.31-.013-.31-.013V5.361h-1.633l.004 1.583H10.97V5.367H9.31v1.569c-.292.007-2.049.006-2.049.006v1.401h.571c.601.016.822.362.798.677v6.041a.408.408 0 0 1-.371.391c-.249.011-.621 0-.621 0l-.32 1.588h1.996v1.6h1.661v-1.591h1.091v1.594h1.624v-1.588c1.899.05 3.643-1.071 3.66-2.913z"></path></svg>
+                    </div>
+
+                    <div class="popupForm likeCommentForm" id="likeCommentForm_${i}">
+                        <input id="likeCommentIndex" type="text" name="index" value="${i}" hidden>
+                        <input id="likeCommentTxid" type="text" name="txid" value="${comments[i].txid}" hidden>
+                        Lock <input id="likeCommentCoins" type="number" name="coins" placeholder="BSV" value="0.01"> BSV for 
+                        <select id="likeCommentBlocks" name="blocks" type="number">
+                            <option value="6">1 hour</option>
+                            <option value="144" >1 day</option>
+                            <option value="1008" selected="selected">7 days</option>
+                            <option value="10950">30 days</option>
+                            <option value="52560">1 year</option>
+                            <option value="525600">10 years</option>
+                        </select>
+                        <button id="lockToPoint" onclick="likeComment(${i})">lock</button>
+                    </div>
+                </div>`
+            }
+        }
+
+        document.getElementById('commentsList').innerHTML = commentHTML;
     }
 
     const getGeoPoints = async (northEastLat, northEastLng, southWestLat, southWestLng) => {
@@ -612,6 +796,64 @@
           lat: pos.coords.latitude,
         };
     };
+    const showUserMarkerSidebar = async (lat,lng) => {
+        var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
+            <div class="tooltip-content popupForm"><input type="point" id="newPointCoordinates" class="long" value="[${lat}, ${lng}]"></div>
+            <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="name" placeholder="name"></div>
+            <div class="tooltip-content popupForm">
+                <div id="standalone-container">
+                  <div id="toolbar-container">
+                    <span class="ql-formats">
+                      <button class="ql-bold"></button>
+                      <button class="ql-italic"></button>
+                      <button class="ql-header" value="1"></button>
+                      <button class="ql-header" value="2"></button>
+                      <button class="ql-list" value="ordered"></button>
+                      <button class="ql-list" value="bullet"></button>
+                      <button class="ql-link"></button>
+                      <button class="ql-image"></button>
+                      <button class="ql-video"></button>
+                    </span>
+                  </div>
+                  <div id="editor-container"></div>
+                </div>
+            </div>
+           
+            <div class="tooltip-content popupForm">
+                Expires in: 
+                <select id="lockBlocks" name="blocks" type="number">
+                    <option value="6">1 hour</option>
+                    <option value="144">1 day</option>
+                    <option value="1008">7 days</option>
+                    <option value="10950">30 days</option>
+                    <option value="52560">1 year</option>
+                    <option value="52560000" selected="selected">Never</option>
+                </select> 
+                <span styles="width:50%">&nbsp;</span>
+                <button id="newPoint" onclick="addCoordinates()">Add</button>
+            </div>`
+
+
+            sidebar.setContent(contentUserMarkerTooltip);
+            sidebar.show();
+
+            Quill.register("modules/imageCompressor", imageCompressor);
+            var quill = new Quill('#editor-container', {
+                modules: {
+                  syntax: false,
+                  toolbar: '#toolbar-container',
+                  imageCompressor: {
+                    quality: 0.9,
+                    maxWidth: 1000, // default
+                    maxHeight: 1000, // default
+                    imageType: 'image/jpeg',
+                    keepImageTypes: ['image/jpeg', 'image/png', 'image/gif']
+                  }
+                },
+                placeholder: 'Point description',
+                theme: 'snow'
+            });
+    }
     const populateMap = async() => {
         latit = getUrlVars()["latit"]
         longit = getUrlVars()["longit"]
@@ -667,13 +909,13 @@
         map.addControl(sidebar);
         sidebar.hide();
 
-        sidebar.on('hidden', function () {
-            map.removeLayer(userMarker); // remove old layer
-        });
-
         // add collision layer
         collisionLayer = L.LayerGroup.collision({margin:15});
         collisionLayer.addTo(map);
+
+        sidebar.on('hidden', function () {
+            map.removeLayer(userMarker); // remove old layer
+        });
 
         if (!getUrlVars()["txid"] && latit === 0 && longit === 0 && getUrlVars()["latit"] !== 0 && getUrlVars()["longit"] !== 0) {
             try {
@@ -698,62 +940,7 @@
                userMarker = null;
             } else {
                 userMarker = new L.Marker([e.latlng.lat, e.latlng.lng], {icon: bitWhiteIcon}).addTo(map);
-                var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
-                    <div class="tooltip-content popupForm"><input type="point" id="newPointCoordinates" class="long" value="[${e.latlng.lat}, ${e.latlng.lng}]"></div>
-                    <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="name" placeholder="name"></div>
-                    <div class="tooltip-content popupForm">
-                        <div id="standalone-container">
-                          <div id="toolbar-container">
-                            <span class="ql-formats">
-                              <button class="ql-bold"></button>
-                              <button class="ql-italic"></button>
-                              <button class="ql-header" value="1"></button>
-                              <button class="ql-header" value="2"></button>
-                              <button class="ql-list" value="ordered"></button>
-                              <button class="ql-list" value="bullet"></button>
-                              <button class="ql-link"></button>
-                              <button class="ql-image"></button>
-                              <button class="ql-video"></button>
-                            </span>
-                          </div>
-                          <div id="editor-container"></div>
-                        </div>
-                    </div>
-                   
-                    <div class="tooltip-content popupForm">
-                        Expires in: 
-                        <select id="lockBlocks" name="blocks" type="number">
-                            <option value="6">1 hour</option>
-                            <option value="144">1 day</option>
-                            <option value="1008">7 days</option>
-                            <option value="10950">30 days</option>
-                            <option value="52560">1 year</option>
-                            <option value="52560000" selected="selected">Never</option>
-                        </select> 
-                        <span styles="width:50%">&nbsp;</span>
-                        <button id="newPoint" onclick="addCoordinates()">Add</button>
-                    </div>`
-
-
-                    sidebar.setContent(contentUserMarkerTooltip);
-                    sidebar.show();
-
-                    Quill.register("modules/imageCompressor", imageCompressor);
-                    var quill = new Quill('#editor-container', {
-                        modules: {
-                          syntax: false,
-                          toolbar: '#toolbar-container',
-                          imageCompressor: {
-                            quality: 0.9,
-                            maxWidth: 1000, // default
-                            maxHeight: 1000, // default
-                            imageType: 'image/jpeg',
-                            keepImageTypes: ['image/jpeg', 'image/png', 'image/gif']
-                          }
-                        },
-                        placeholder: 'Point description',
-                        theme: 'snow'
-                    });
+                userMarker.bindPopup(`<a onclick="showUserMarkerSidebar(${e.latlng.lat}, ${e.latlng.lng})">Add this location</a>`).openPopup();
             }  
         });
     }
