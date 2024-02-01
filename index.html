@@ -361,6 +361,7 @@
     var longit = null;
     var curNorthEastLat = null
     var curNorthEastLng = null
+    var curZoom = null
     var map, markerLayerGroup, collisionLayer, sidebar;
 
     var getUrlVars = function() {
@@ -959,25 +960,19 @@
         }
 
         map.on('moveend', async function(e) {
-
-            // var tmp_glob = glob;
-            // setTimeout(function () {
-            //     if (tmp_glob == glob) {
-            //         console.log("The value hasn't changed.");
-            //     } else {
-            //         console.log("The value has changed");
-            //         tmp_glob = glob;
-            //     }
-            // }, 10000);
-
-            var bounds = map.getBounds();
-            var northEast = bounds.getNorthEast();
-            if (northEast.lat !== curNorthEastLat && northEast.lng !== curNorthEastLng) {
-                console.log("fired")
-                curNorthEastLat = northEast.lat
-                curNorthEastLng = northEast.lng
-                populatePoints()
-            }
+            var tmpZoom = map.getZoom();
+            curZoom = tmpZoom
+            setTimeout(function () {
+                if (tmpZoom === curZoom) {
+                    var bounds = map.getBounds();
+                    var northEast = bounds.getNorthEast();
+                    if (northEast.lat !== curNorthEastLat && northEast.lng !== curNorthEastLng) {
+                        curNorthEastLat = northEast.lat
+                        curNorthEastLng = northEast.lng
+                        populatePoints()
+                    }
+                }
+            }, 350);
         });
         map.on('click', function (e) {
             addUserMarker(e.latlng.lat, e.latlng.lng)
