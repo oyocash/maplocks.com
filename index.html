@@ -326,9 +326,6 @@
             a {
                 cursor:pointer;
             }
-            @media only screen and (min-width: 600px) {
-
-            }
         </style>
 
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -362,6 +359,8 @@
     var userMarker;
     var latit = null;
     var longit = null;
+    var curNorthEastLat = null
+    var curNorthEastLng = null
     var map, markerLayerGroup, collisionLayer, sidebar;
 
     var getUrlVars = function() {
@@ -900,6 +899,7 @@
         map.setView([latit, longit], 13); 
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            minZoom: 2,
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
@@ -958,8 +958,26 @@
             } catch(err) {}
         }
 
-        map.on('moveend', async function() {
-            populatePoints()
+        map.on('moveend', async function(e) {
+
+            // var tmp_glob = glob;
+            // setTimeout(function () {
+            //     if (tmp_glob == glob) {
+            //         console.log("The value hasn't changed.");
+            //     } else {
+            //         console.log("The value has changed");
+            //         tmp_glob = glob;
+            //     }
+            // }, 10000);
+
+            var bounds = map.getBounds();
+            var northEast = bounds.getNorthEast();
+            if (northEast.lat !== curNorthEastLat && northEast.lng !== curNorthEastLng) {
+                console.log("fired")
+                curNorthEastLat = northEast.lat
+                curNorthEastLng = northEast.lng
+                populatePoints()
+            }
         });
         map.on('click', function (e) {
             addUserMarker(e.latlng.lat, e.latlng.lng)
