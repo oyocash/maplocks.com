@@ -576,7 +576,8 @@
 
         let rawtx = lockPost(localStorage.walletAddress, lockHeight, satoshis, null, content, null);
         if (rawtx) {
-            const c = confirm(`Add location "${document.getElementById('newPointCoordinates').value}"?`);
+            // const c = confirm(`Add location "${document.getElementById('newPointCoordinates').value}"?`);
+            const c = 1;
             if (c) {
                 rawtx = await payForRawTx(rawtx)
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
@@ -607,7 +608,12 @@
 
         let rawtx = lockLike(localStorage.walletAddress, lockHeight, satoshis, null, txid, null);
         if (rawtx) {
-            const c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight - currentHeight} blocks)?`);
+            var c;
+            if (lockedBSVs > 0.01) {
+                c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight - currentHeight} blocks)?`);
+            } else {
+                c = 1;
+            }
             if (c) {
                 map.closePopup();
                 rawtx = await payForRawTx(rawtx)
@@ -653,7 +659,8 @@
 
         let rawtx = lockPost(localStorage.walletAddress, lockHeight, satoshis, null, content, repliedTxid);
         if (rawtx) {
-            const c = confirm(`Add comment "${content}"?`);
+            // const c = confirm(`Add comment "${content}"?`);
+            const c = 1;
             if (c) {
                 rawtx = await payForRawTx(rawtx)
                 const t = await broadcast(rawtx, true, localStorage.walletAddress);
@@ -686,7 +693,12 @@
 
         let rawtx = lockLike(localStorage.walletAddress, lockHeight, satoshis, null, txid, null);
         if (rawtx) {
-            const c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight - currentHeight} blocks)?`);
+            var c;
+            if (lockedBSVs > 0.01) {
+                c = confirm(`Like ${txid} (${lockedBSVs} BSV for ${lockHeight - currentHeight} blocks)?`);
+            } else {
+                c = 1;
+            }
             if (c) {
                 hideLikeCommentForm(index);
                 rawtx = await payForRawTx(rawtx)
