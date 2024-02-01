@@ -568,6 +568,7 @@
             alert("You must have a wallet to add locations")
             window.location.href = '/wallet/';
         }
+        document.getElementById("newPoint").disabled = true;
 
         const currentHeight = await getBlock();
         let lockHeight = parseInt(currentHeight) + parseInt(document.getElementById('lockBlocks').value);
@@ -587,18 +588,28 @@
                     geoPoints.push({txid: t, name: document.getElementById('newPointName').value, content: document.querySelector(".ql-editor").innerHTML, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
                     localGeoPoints.push({txid: t, name: document.getElementById('newPointName').value, content: document.querySelector(".ql-editor").innerHTML, bsv: (satoshis / 100000000), coordinates: JSON.parse(document.getElementById('newPointCoordinates').value)})
                     addMarker(geoPoints.length - 1)
+
+                    document.getElementById("newPoint").disabled = false;
                 } else {
                     alert(t)
+                    document.getElementById("newPoint").disabled = false;
                 }
                 sidebar.hide();
-            } else { return }
-        } 
+            } else { 
+                document.getElementById("newPoint").disabled = false;
+                return
+            }
+        } else {
+            document.getElementById("newPoint").disabled = false;
+        }
     }
 
     const likeCoordinates = async (index) => {
         if (!localStorage.walletAddress) {
+            alert("You must have a wallet to like locations")
             window.location.href = '/profile/';
         }
+        document.getElementById("lockToPoint").disabled = true;
 
         const currentHeight = await getBlock();
         const lockHeight = parseInt(currentHeight) + parseInt(document.getElementById(`likeBlocks`).value);
@@ -623,6 +634,7 @@
                     let localGeoPointsIndex = null;
                     for (let i = 0; i < localGeoPoints.length; i++) {
                         if (localGeoPoints[i].txid === geoPoints[index].txid) {
+                            geoPoints[index].bsv = parseFloat(geoPoints[index].bsv) + parseFloat(lockedBSVs)
                             localGeoPointsIndex = i
                             localGeoPoints[i].bsv = parseFloat(localGeoPoints[i].bsv) + parseFloat(lockedBSVs)
                             localGeoPoints[i].bsv = localGeoPoints[i].bsv.toFixed(8);
@@ -636,12 +648,22 @@
                         geoPoints[index].satoshis += satoshis
                         localGeoPoints.push(geoPoints[index])
                     }
+                    document.getElementById('lockedBSVText').innerHTML = geoPoints[index].bsv;
+
                     alert(`Maplock liked: ${t}`);
                     addMarker(index, 0)
+
+                    document.getElementById("lockToPoint").disabled = false;
                 } else {
                     alert(t)
+                    document.getElementById("lockToPoint").disabled = false;
                 }
-            } else { return }
+            } else { 
+                document.getElementById("lockToPoint").disabled = false;
+                return 
+            }
+        } else {
+            document.getElementById("lockToPoint").disabled = false;
         } 
     }
 
@@ -650,6 +672,8 @@
             alert("You must have a wallet to make comments")
             window.location.href = '/wallet/';
         }
+
+        document.getElementById("newComment").disabled = true;
 
         const currentHeight = await getBlock();
         let repliedTxid = document.getElementById('commentedTxid').value
@@ -673,10 +697,18 @@
                     hideCommentForm();
                     document.getElementById('newCommentContent').value = ""
                     getCommentsHTML(index)
+
+                    document.getElementById("newComment").disabled = false;
                 } else {
                     alert(t)
+                    document.getElementById("newComment").disabled = false;
                 }
-            } else { return }
+            } else { 
+                document.getElementById("newComment").disabled = false;
+                return
+            }
+        } else {
+            document.getElementById("newComment").disabled = false;
         } 
     }
 
@@ -684,6 +716,7 @@
         if (!localStorage.walletAddress) {
             window.location.href = '/profile/';
         }
+        document.getElementById("likeComment").disabled = true;
 
         const currentHeight = await getBlock();
         const lockHeight = parseInt(currentHeight) + parseInt(document.getElementById(`likeCommentBlocks`).value);
@@ -707,10 +740,19 @@
                     addTx({'txid': t, 'height': lockHeight, 'satoshis': satoshis});
                     comments[index].bsv = comments[index].bsv + lockedBSVs
                     document.getElementById('likedCommentBSV_' + index).innerHTML = comments[index].bsv;
+                document.getElementById("likeComment").disabled = false;
+
                 } else {
                     alert(t)
+                    document.getElementById("likeComment").disabled = false;
+
                 }
-            } else { return }
+            } else { 
+                document.getElementById("likeComment").disabled = false;
+                return 
+            }
+        } else {
+            document.getElementById("likeComment").disabled = false;
         } 
     }
 
@@ -757,7 +799,7 @@
                             <option value="52560">1 year</option>
                             <option value="525600">10 years</option>
                         </select>
-                        <button id="lockToPoint" onclick="likeComment(${i})">lock</button>
+                        <button id="likeComment" onclick="likeComment(${i})">lock</button>
                     </div>
                 </div>`
             }
