@@ -315,16 +315,18 @@
             }
             img.leaflet_button {
                 text-align: center;
-                padding-top: 3px;
+                width: 22px;
+                height: 22px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
             }
             a {
                 cursor:pointer;
             }
             @media only screen and (min-width: 600px) {
-                img.leaflet_button {
-                    padding-top: 5px;
-                    padding-right: 20px;
-                }
+
             }
         </style>
 
@@ -930,7 +932,7 @@
         collisionLayer.addTo(map);
 
         // add buttons
-        L.easyButton('<img src="/assets/icon-target.svg" class="leaflet_button" width=22 height=22>', async function(btn, map){
+        L.easyButton('<img src="/assets/icon-target.svg" class="leaflet_button">', async function(btn, map){
             var position = await getCoords();
             latit = position.lat
             longit = position.long
@@ -938,7 +940,7 @@
             addUserMarker(latit, longit)
         }).addTo(map);
         if (localStorage.walletAddress) {
-            L.easyButton('<img src="/assets/icon-profile-user.svg" class="leaflet_button" width=22 height=22>', function(btn, map){
+            L.easyButton('<img src="/assets/icon-profile-user.svg" class="leaflet_button">', function(btn, map){
                 window.location.href='/profile/';
             }).addTo(map);
         }
