@@ -40,7 +40,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                height: 100vh;
+                vertical-align: top;
+                height: 100%;
             }
 
             .container {
@@ -87,8 +88,11 @@
     <body>
         <div class="btns center" id="shlogin">
             <a href="/">Back to maplocks</a>
-            <p><a href="/user/locations.html">My locations</a></p>
-            <p><a href="/user/likes.html">My likes</a></p>
+            <div class="wallet-address">
+                <button onclick="location.href = '/user/locations.html'">My locations</button>
+                <button onclick="location.href = '/user/likes.html'">My likes</button>
+            </div>
+        </div>    
     </body>
 </html>
 <script src="/scripts/SHUAllet.js"></script>
