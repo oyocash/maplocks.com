@@ -653,15 +653,15 @@
                 window.location.href='/profile/';
             }).addTo(map);
         }
-        // L.easyButton('<img src="/assets/icon-trophy.svg" class="leaflet_button">', function(btn, map){
-        //     window.location.href='/rankings/';
-        // }).addTo(map);
-        // L.easyButton('<img src="/assets/icon-coin.svg" class="leaflet_button">', function(btn, map){
-        //     window.location.href='/mint/';
-        // }).addTo(map);
+        L.easyButton('<img src="/assets/icon-trophy.svg" class="leaflet_button">', function(btn, map){
+            window.location.href='/rankings/';
+        }).addTo(map);
+        L.easyButton('<img src="/assets/icon-coin.svg" class="leaflet_button">', function(btn, map){
+            window.location.href='/mint/';
+        }).addTo(map);
 
         sidebar.on('hidden', function () {
-            map.removeLayer(userMarker); // remove old layer
+            if(userMarker) map.removeLayer(userMarker); // remove old layer
         });
 
         if (!getUrlVars()["txid"] && latit === 0 && longit === 0 && getUrlVars()["latit"] !== 0 && getUrlVars()["longit"] !== 0) {

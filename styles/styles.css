@@ -41,7 +41,7 @@ html, body {
     background: transparent;
 }
 .transparent-tooltip {
-  -webkit-text-stroke: 0.4px white; /* width and color */
+/*  -webkit-text-stroke: 0.4px white; /* width and color */*/
   color: #a00;
   font-size: 14px;
   font-weight: 900;
@@ -274,7 +274,7 @@ img.leaflet_button {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    margin-left: 1px;
+    margin-left: 0px;
 }
 a {
     cursor:pointer;

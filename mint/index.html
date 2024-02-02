@@ -22,7 +22,7 @@
         <meta http-equiv="Expires" content="0" />
 
         <script src="/scripts/message.js"></script>
-        
+
         <script src="/scripts/maplocks.js"></script>
         <link href="/styles/styles.css" rel="stylesheet">
 
@@ -30,13 +30,54 @@
     <body>
         <div class="nonmap-container btns center" id="shlogin">
             <div><a href="/">Back to maplocks</a></div>
-            <div id="walletAddress" class="wallet-address">Soon</div>
+            <div class="text-block" id="title"><h3>$map mint event</h3></div>
+
+            <div class="text-block"><p><b>$map</b> is a bsv20 token.  The mint will be perform as follows: </p>
+                <p>For every 0.01 BSV locked on a geolocation on maplocks.com at least to block 877000 you will receive 1000 $maps (lock for 1 year).<p>
+                <p>End of mint - block 832000.</p>
+                <p>Your $map tokens will be sent to you after the end of mint.</p>
+                <br>
+                <p><b style="color:#c44">You must fill your ordinal address if you want to participate in the mint!</b></p>
+                <p>If you are unsure what is "ordinal address" is, just click "Send" on the form below.</p>
+            </div>
+
+            <div class="text-block">
+                <input id="ordinalAddress" name="ordinalAddress">
+                <button onclick="sendOrdinalAddress()">Send</button>
+            </div>
+            <div class="text-block" id="result"></div>
+
 
         </div>
     </body>
 </html>
 
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function() {
+    const setOrdinalAddress = async (ordinalAddress, walletAddress, signature) => {
+        const r = await fetch(`${dataURL}setOrdinalAddress/`, {
+            method: 'post',
+            body: JSON.stringify({ ordinalAddress, walletAddress, signature })
+        })
+        const res = await r.text();
+        return JSON.parse(res);
+    }
+    document.getElementById('ordinalAddress').value = localStorage.ownerAddress;
+
+    const sendOrdinalAddress = async () => {
+        const ordinalAddress = document.getElementById('ordinalAddress').value;
+        const bsvPrivateKey = bsv.PrivateKey.fromWIF(localStorage.walletKey);
+        const signature = bsvMessage.sign(ordinalAddress, bsvPrivateKey)
+        console.log(signature)
+
+        const isVerified = await setOrdinalAddress(ordinalAddress, localStorage.walletAddress, signature)
+
+        if (isVerified === 1) {
+            document.getElementById('result').innerHTML = "Ordinal address added";
+        } else {
+            document.getElementById('result').innerHTML = "Error. Ordinal address not added";
+        }
+        console.log(isVerified)
+    }
+    (async () => {
     })
 </script>
