@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Maplocks.com - user locks</title>
+        <title>Maplocks.com - user likes</title>
         <meta name="description" content="Profile page of maplocks.com">
         <meta name=”robots” content="index, follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
-        <meta property="og:title" content="Maplocks.com - real world locks.  Profile page">
+        <meta property="og:title" content="Maplocks.com - Geolocation liked by user">
         <meta property="og:image" content="/assets/marker-icon-2x-bit-1.png">
         
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
@@ -18,65 +18,16 @@
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
 
-        <style>
-            body {
-                font-family: 'Arial', sans-serif;
-                background-color: #f5f5f5;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-            }
-
-            .container {
-                text-align: center;
-                padding: 20px;
-                background-color: #fff;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-
-            .text-block {
-                margin:10px 0px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            a {
-                text-decoration: none;
-                color: rgb(255, 138, 76);
-            }
-
-            .item-list {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-
-            .item {
-                border-bottom: 1px solid #ccc;
-                padding: 10px;
-                font-size: 16px;
-                color: #333;
-                text-align: left;
-            }
-
-            .item:last-child {
-                border-bottom: none;
-            }
-        </style>
+        <script src="/scripts/maplocks.js"></script>
+        <link href="/styles/styles.css" rel="stylesheet">
     </head>
 <body>
-    <div class="btns center">
-        <div class="text-block">
-            <a href="/">Back to maplocks</a>
-        </div>
+    <div class="nonmap-container btns center">
+        <div><a href="/">Back to maplocks</a></div>
 
         <div class="text-block" id="title"></div>
 
-        <div class="container">
+        <div class="items-container">
             <ul class="item-list" id="items"></ul>
         </div>
 
@@ -85,16 +36,6 @@
 </body>
 </html>
 <script type="text/javascript">
-    window.dataURL = "https://data.trends.cash:9007/"
-
-    var getUrlVars = function() {
-        var vars = {};
-        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-            vars[key] = value;
-        });
-        return vars;
-    }
-
     const getUserLikes = async (address, app, skip) => {
         const r = await fetch(`${dataURL}getMaplockUserLikes/`, {
             method: 'post',

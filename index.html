@@ -13,320 +13,19 @@
         <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
         <link rel="manifest" href="/assets/site.webmanifest">
 
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.min.js"></script>
+        <link rel="stylesheet" href="/styles/leaflet.bundle.css"/>
         <script src="/scripts/rbush.js"></script>
-        <script src="/scripts/Leaflet.LayerGroup.Collision.js"></script>
+        <script src="/scripts/leaflet.bundle.js"></script>
 
-        <link rel="stylesheet" href="/styles/L.Control.Sidebar.css" />
-        <script src="/scripts/L.Control.Sidebar.js"></script>
-
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
-        <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
-
-        <script src="/scripts/leaflet-color-markers.js"></script>
         <link href="/styles/shuallet.css" rel="stylesheet" type="text/css">
         <script src="/scripts/bsv.browser.min.js"></script>
-        <script src="/scripts/api.js"></script>
-        <script src="/scripts/params.js"></script>
-        <script src="/scripts/bSocial.js"></script>
-        <script src="/scripts/bSocialPost.js"></script>
-        <script src="/scripts/bSocialLike.js"></script>
-        <script src="/scripts/bHelpers.js"></script>
-        <script src="/scripts/helpers.js"></script>
-        <script src="/scripts/bsv-lock.js"></script>
-        <script src="/scripts/idb.js"></script>
 
-        <script src="//cdn.quilljs.com/1.3.6/quill.min.js"></script>
-        <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-        <script src="https://unpkg.com/quill-image-compress@1.2.11/dist/quill.imageCompressor.min.js"></script>
+        <script src="/scripts/quill.min.js"></script>
+        <link href="/styles/quill.snow.css" rel="stylesheet">
         <script src="/scripts/purify.min.js"></script>
 
-        <style type="text/css">
-            @font-face { font-family: RobotoFlex; src: url('RobotoFlex-Regular.ttf'); }
-            html, body {
-              height: 100%;
-              margin: 0;
-              padding: 0;
-            }
-            #map { height: 100%; }
-            #walletButton {
-              position: absolute;
-              top: 30px;
-              right: 10px;
-              padding: 10px;
-              z-index: 400;
-            }
-            .leaflet-container a.woc-icon {
-                position: absolute;
-                top: 0px;
-                left: 0px;
-                padding-top:5px;
-                border: none;
-                text-align: center;
-                width: 36px;
-                height: 36px;
-                font: 24px/36px Tahoma, Verdana, sans-serif;
-                color: #757575;
-                text-decoration: none;
-                background: transparent;
-            }
-            .leaflet-container a.share-icon {
-                position: absolute;
-                top: 0px;
-                left:36px;
-                padding-top:5px;
-                border: none;
-                text-align: center;
-                width: 36px;
-                height: 36px;
-                font: 24px/36px Tahoma, Verdana, sans-serif;
-                color: #757575;
-                text-decoration: none;
-                background: transparent;
-            }
-            .transparent-tooltip {
-              -webkit-text-stroke: 0.4px white; /* width and color */
-              color: #a00;
-              font-size: 14px;
-              font-weight: 900;
-              background: transparent;
-              border: none;
-              box-shadow: none;
-              text-align: center;
-            }
-            .transparent-tooltip::before {
-              border: none;
-            }
-            .tooltip-title {
-                font-family: RobotoFlex;
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 32px;
-                text-align: center;
-                font-family: RobotoFlex;
-                padding:10px, 10px;
-                border-top-left-radius: 12px;
-                border-top-right-radius: 12px;
-            }
-            .tooltip-content {
-                color: rgb(107, 114, 128);
-                font-family: RobotoFlex;
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 22px;
-                text-align: center;
-                vertical-align: middle;
-                margin:10px 0px;
-            }
-            .tooltip-bigContent {
-                text-align: left;
-            }
-            .tooltip-bigContent img {
-                width: 100%;
-            }
-            .coinIcon {
-                color: rgb(255, 138, 76);
-                font-size: 14px;
-                height: 16px;
-                line-height: 22px;
-                margin-left: 4px;
-                vertical-align: middle;
-                width: 14px;
-                margin-bottom: 2px;
-            }
-            .popupForm {
-                text-align: center;
-            }
-            .popupForm table {
-            }
-            .popupForm th {
-                font-family: RobotoFlex;
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 22px;
-                margin:5px;
-            }
-            .popupForm td {
-                font-family: RobotoFlex;
-                font-size: 16px;
-                font-weight: 400;
-                line-height: 22px;
-                margin:5px;
-            }
-            .popupForm input {
-                border-radius: 12px;
-                border: 1px solid rgb(209, 213, 219);
-                background: rgb(249, 250, 251);
-                padding: 10px; 
-                width: 100px;
-                height: 25px;
-                font-family: RobotoFlex;
-                font-size: 16px;
-                color: rgb(17, 24, 39);
-            }
-            .popupForm input.long {
-                width:95%;
-            }
-            .popupForm select {
-                border-radius: 12px;
-                border: 1px solid rgb(209, 213, 219);
-                background: rgb(249, 250, 251);
-                padding: 3px; 
-                font-family: RobotoFlex;
-                font-size: 16px;
-                color: rgb(17, 24, 39);
-            }
-            .popupForm textarea {
-                border-radius: 12px;
-                border: 1px solid rgb(209, 213, 219);
-                background: rgb(249, 250, 251);
-                padding: 10px; 
-                width: 95%;
-                height: 150px;
-                font-family: RobotoFlex;
-                font-size: 16px;
-                color: rgb(17, 24, 39);
-            }
-            .popupForm button {
-                background-color: rgba(0, 0, 0, 0);
-                background-image: linear-gradient(to right bottom, rgb(253, 186, 140), rgb(208, 56, 1));
-                border: 1px solid #fff;
-                border-radius: 12px;
-                color: rgb(255, 255, 255);
-                cursor:pointer;
-                font-family: RobotoFlex;
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 22px;
-                margin-top: 5px;
-                padding: 8px 16px;
-            }
-            .popupForm #toolbar-container {
-                border-top-left-radius: 12px;
-                border-top-right-radius: 12px;
-            }
-            .popupForm #editor-container {
-                width:100%;
-                height:60%;
-                border-bottom-left-radius: 12px;
-                border-bottom-right-radius: 12px;
-                border: 1px solid rgb(209, 213, 219);
-                background: rgb(249, 250, 251);
-                padding: 10px;
-                font-family: RobotoFlex;
-                font-size: 16px;
-                color: rgb(17, 24, 39);
-            }
-            .align-right {
-                text-align: right;
-                margin-right:0px;
-            }
-            .popupForm a {
-                color: #757575;
-            }
-            .tabs {
-                text-align: left;
-            }
-            .locationTab {
-                margin: 10px;
-            }
-            .locationTabActive {
-                text-decoration: underline;
-            }
-            .locationTab a {
-                font-size: 17px;
-                font-weight: bold;
-            }
-            #markerComments {
-                display: none;
-            }
-            .commentItem {
-                border: 1px solid rgb(209, 213, 219);
-                border-radius: 8px;
-                margin-top:8px;
-            }
-            .commentItem .top {
-                color: #000;
-                display: flex;
-                font-family: RobotoFlex;
-                justify-content: space-between;
-                line-height: 24px;
-                padding-bottom: 4px;
-                padding-left: 8px;
-                padding-right: 8px;
-                padding-top: 12px
-            }
-            .commentItem .address {
-                color: #000;
-                display: block;
-                font-family: RobotoFlex;
-                font-weight: 600;
-                line-height: 20px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 35%;
-            }
-            .commentItem .address a {
-                color: #000;
-                text-decoration: underline;
-            }
-            .commentItem .timestamp {
-                color: rgb(75, 85, 99);
-                display: block;
-                font-family: RobotoFlex;
-                font-size: 14px;
-                line-height: 20px;
-                padding-left: 8px;
-            }
-            .commentItem .comment {
-                color: rgb(0, 0, 0);
-                font-family: RobotoFlex;
-                line-height: 24px;
-                margin-left: 8px;
-                margin-bottom: 5px;
-                overflow-x: auto;
-                overflow-y: auto;
-                padding-bottom: 0px;
-                padding-left: 12px;
-                padding-right: 12px;
-                max-height: 200px;
-                text-align: left;
-            }
-            .commentItem .buttons {
-                line-height: 24px;
-                margin-left: 8px;
-                margin-bottom: 5px;
-                padding-bottom: 0px;
-                padding-left: 12px;
-                padding-right: 12px;
-                text-align: left;
-            }
-            .commentItem .commentButton {
-                vertical-align: bottom;
-            }
-            .commentItem .buttons a {
-                color: #757575;
-            }
-            .likeCommentForm {
-                display: none;
-            }
-            img.leaflet_button {
-                text-align: center;
-                width: 22px;
-                height: 22px;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                margin-left: 1px;
-            }
-            a {
-                cursor:pointer;
-            }
-        </style>
+        <script src="/scripts/maplocks.js"></script>
+        <link href="/styles/styles.css" rel="stylesheet">
 
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta http-equiv="Pragma" content="no-cache" />
@@ -344,14 +43,11 @@
       <div id="bars"></div>
       <div id="sidebar"></div>
     </div>
+    <script src="/scripts/shuallet.bundle.js"></script>
     </body>
 </html>
 
-<script src="/scripts/SHUAllet.js"></script>
-
 <script language='javascript'>
-    window.dataURL = "https://data.trends.cash:9007/"
-
     var geoPoints = []
     var localGeoPoints = []
     var comments = [];
@@ -363,47 +59,6 @@
     var curNorthEastLng = null
     var curZoom = null
     var map, markerLayerGroup, collisionLayer, sidebar;
-
-    var getUrlVars = function() {
-      var vars = {};
-      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-          vars[key] = value;
-      });
-      return vars;
-    }
-
-    const timeAgo = (date) => {
-      const seconds = Math.floor((new Date() - date) / 1000);
-
-      let interval = Math.floor(seconds / 31536000);
-      if (interval > 1) {
-        return interval + ' years ago';
-      }
-
-      interval = Math.floor(seconds / 2592000);
-      if (interval > 1) {
-        return interval + ' months ago';
-      }
-
-      interval = Math.floor(seconds / 86400);
-      if (interval > 1) {
-        return interval + ' days ago';
-      }
-
-      interval = Math.floor(seconds / 3600);
-      if (interval > 1) {
-        return interval + ' hours ago';
-      }
-
-      interval = Math.floor(seconds / 60);
-      if (interval > 1) {
-        return interval + ' minutes ago';
-      }
-
-      if(seconds < 10) return 'just now';
-
-      return Math.floor(seconds) + ' seconds ago';
-    };
 
     const addMarker = (i, addCollision = 1) => {
         var iconStyle;
@@ -417,7 +72,6 @@
         if (geoPoints[i].bsv < 1000) iconStyle = bit1000Icon; else
         if (geoPoints[i].bsv < 100000) iconStyle = bit1000Icon;
 
-        console.log(JSON.stringify(geoPoints[i]))
         if (geoPoints[i].name === null) geoPoints[i].name = ""
         var popupName = geoPoints[i].name.replace(/<[^>]+>/g, '');
         if (popupName.length > 36) {
@@ -762,7 +416,6 @@
             body: JSON.stringify({ txid, skip })
         })
         const res = await r.text();
-        console.log(res)
         if (localComments[txid] === undefined) return JSON.parse(res);
         return localComments[txid].concat(JSON.parse(res));
     }
@@ -830,7 +483,7 @@
 
     const copyLinkToClipboard = (txid) => {
         const link = "https://maplocks.com/?txid=" + txid
-        alert(`${link}\n\nCopied`)
+        alert(`${link}`)
         navigator.clipboard.writeText(link);
     }
 
@@ -1000,6 +653,12 @@
                 window.location.href='/profile/';
             }).addTo(map);
         }
+        // L.easyButton('<img src="/assets/icon-trophy.svg" class="leaflet_button">', function(btn, map){
+        //     window.location.href='/rankings/';
+        // }).addTo(map);
+        // L.easyButton('<img src="/assets/icon-coin.svg" class="leaflet_button">', function(btn, map){
+        //     window.location.href='/mint/';
+        // }).addTo(map);
 
         sidebar.on('hidden', function () {
             map.removeLayer(userMarker); // remove old layer

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Maplocks.com - rankings</title>
+        <meta name="description" content="Geolocations with most locked coins">
+        <meta name=”robots” content="index, follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <meta property="og:title" content="Maplocks.com - Geolocations with most locked coins">
+        <meta property="og:image" content="/assets/marker-icon-2x-bit-1.png">
+        
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+        <link rel="manifest" href="/assets/site.webmanifest">
+
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+
+        <script src="/scripts/maplocks.js"></script>
+        <link href="/styles/styles.css" rel="stylesheet">
+
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <div class="nonmap-container btns center">
+            <div><a href="/">Back to maplocks</a></div>
+
+            <div class="text-block" id="title"><h3>Rankings (at least 1 BSV locked)</h3></div>
+
+            <div class="items-container">
+                <ul class="item-list" id="items"></ul>
+            </div>
+        </div>
+    </body>
+</html>
+<script type="text/javascript">
+    (async () => {
+        let rMaplocks = await fetch(dataURL + "maplocksCached.json");
+        let data = await rMaplocks.json()
+        let divHTML = ""
+        console.log(JSON.stringify(data))
+        for (let i = 0; i < data.length; i++) {
+            // if (data[i].txid === null || data[i].name === null) continue;
+            divHTML += `<li class="item">${i + 1}.  <a href="/?txid=${data[i].txid}">${data[i].name}</a> - ${data[i].satoshis / 100000000} BSV</li>`
+        }
+        document.getElementById('items').innerHTML = divHTML;
+
+    })().catch(e => console.log("Caught: " + e)); // Catches it.
+</script>

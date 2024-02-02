@@ -1,0 +1,354 @@
+@font-face { font-family: RobotoFlex; src: url('../RobotoFlex-Regular.ttf'); }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#map { height: 100%; }
+#walletButton {
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  padding: 10px;
+  z-index: 400;
+}
+.leaflet-container a.woc-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding-top:5px;
+    border: none;
+    text-align: center;
+    width: 36px;
+    height: 36px;
+    font: 24px/36px Tahoma, Verdana, sans-serif;
+    color: #757575;
+    text-decoration: none;
+    background: transparent;
+}
+.leaflet-container a.share-icon {
+    position: absolute;
+    top: 0px;
+    left:36px;
+    padding-top:5px;
+    border: none;
+    text-align: center;
+    width: 36px;
+    height: 36px;
+    font: 24px/36px Tahoma, Verdana, sans-serif;
+    color: #757575;
+    text-decoration: none;
+    background: transparent;
+}
+.transparent-tooltip {
+  -webkit-text-stroke: 0.4px white; /* width and color */
+  color: #a00;
+  font-size: 14px;
+  font-weight: 900;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  text-align: center;
+}
+.transparent-tooltip::before {
+  border: none;
+}
+.tooltip-title {
+    font-family: RobotoFlex;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 32px;
+    text-align: center;
+    font-family: RobotoFlex;
+    padding:10px, 10px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+.tooltip-content {
+    color: rgb(107, 114, 128);
+    font-family: RobotoFlex;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    text-align: center;
+    vertical-align: middle;
+    margin:10px 0px;
+}
+.tooltip-bigContent {
+    text-align: left;
+}
+.tooltip-bigContent img {
+    width: 100%;
+}
+.coinIcon {
+    color: rgb(255, 138, 76);
+    font-size: 14px;
+    height: 16px;
+    line-height: 22px;
+    margin-left: 4px;
+    vertical-align: middle;
+    width: 14px;
+    margin-bottom: 2px;
+}
+.popupForm {
+    text-align: center;
+}
+.popupForm table {
+}
+.popupForm th {
+    font-family: RobotoFlex;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    margin:5px;
+}
+.popupForm td {
+    font-family: RobotoFlex;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    margin:5px;
+}
+.popupForm input {
+    border-radius: 12px;
+    border: 1px solid rgb(209, 213, 219);
+    background: rgb(249, 250, 251);
+    padding: 10px; 
+    width: 100px;
+    height: 25px;
+    font-family: RobotoFlex;
+    font-size: 16px;
+    color: rgb(17, 24, 39);
+}
+.popupForm input.long {
+    width:95%;
+}
+.popupForm select {
+    border-radius: 12px;
+    border: 1px solid rgb(209, 213, 219);
+    background: rgb(249, 250, 251);
+    padding: 3px; 
+    font-family: RobotoFlex;
+    font-size: 16px;
+    color: rgb(17, 24, 39);
+}
+.popupForm textarea {
+    border-radius: 12px;
+    border: 1px solid rgb(209, 213, 219);
+    background: rgb(249, 250, 251);
+    padding: 10px; 
+    width: 95%;
+    height: 150px;
+    font-family: RobotoFlex;
+    font-size: 16px;
+    color: rgb(17, 24, 39);
+}
+.popupForm button {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: linear-gradient(to right bottom, rgb(253, 186, 140), rgb(208, 56, 1));
+    border: 1px solid #fff;
+    border-radius: 12px;
+    color: rgb(255, 255, 255);
+    cursor:pointer;
+    font-family: RobotoFlex;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    margin-top: 5px;
+    padding: 8px 16px;
+}
+.popupForm #toolbar-container {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+.popupForm #editor-container {
+    width:100%;
+    height:60%;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border: 1px solid rgb(209, 213, 219);
+    background: rgb(249, 250, 251);
+    padding: 10px;
+    font-family: RobotoFlex;
+    font-size: 16px;
+    color: rgb(17, 24, 39);
+}
+.align-right {
+    text-align: right;
+    margin-right:0px;
+}
+.popupForm a {
+    color: #757575;
+}
+.tabs {
+    text-align: left;
+}
+.locationTab {
+    margin: 10px;
+}
+.locationTabActive {
+    text-decoration: underline;
+}
+.locationTab a {
+    font-size: 17px;
+    font-weight: bold;
+}
+#markerComments {
+    display: none;
+}
+.commentItem {
+    border: 1px solid rgb(209, 213, 219);
+    border-radius: 8px;
+    margin-top:8px;
+}
+.commentItem .top {
+    color: #000;
+    display: flex;
+    font-family: RobotoFlex;
+    justify-content: space-between;
+    line-height: 24px;
+    padding-bottom: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 12px
+}
+.commentItem .address {
+    color: #000;
+    display: block;
+    font-family: RobotoFlex;
+    font-weight: 600;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 35%;
+}
+.commentItem .address a {
+    color: #000;
+    text-decoration: underline;
+}
+.commentItem .timestamp {
+    color: rgb(75, 85, 99);
+    display: block;
+    font-family: RobotoFlex;
+    font-size: 14px;
+    line-height: 20px;
+    padding-left: 8px;
+}
+.commentItem .comment {
+    color: rgb(0, 0, 0);
+    font-family: RobotoFlex;
+    line-height: 24px;
+    margin-left: 8px;
+    margin-bottom: 5px;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding-bottom: 0px;
+    padding-left: 12px;
+    padding-right: 12px;
+    max-height: 200px;
+    text-align: left;
+}
+.commentItem .buttons {
+    line-height: 24px;
+    margin-left: 8px;
+    margin-bottom: 5px;
+    padding-bottom: 0px;
+    padding-left: 12px;
+    padding-right: 12px;
+    text-align: left;
+}
+.commentItem .commentButton {
+    vertical-align: bottom;
+}
+.commentItem .buttons a {
+    color: #757575;
+}
+.likeCommentForm {
+    display: none;
+}
+img.leaflet_button {
+    text-align: center;
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-left: 1px;
+}
+a {
+    cursor:pointer;
+}
+
+.nonmap-container {
+    font-family: RobotoFlex;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+    display: block;
+    height: 100vh;
+}
+
+.items-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.text-block {
+    margin:10px 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nonmap-container a {
+    text-decoration: none;
+    color: rgb(255, 138, 76);
+}
+
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.item {
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    font-size: 16px;
+    color: #333;
+    text-align: left;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.wallet-address, .wallet-balance {
+    margin: 10px 0px;
+    padding-left:10px;
+    font-size: 18px;
+    color: #555;
+}
+
+.create-wallet, .backup-wallet {
+    margin-top: 20px;
+    padding-left:10px;
+}
+
+#qrcode {
+    padding-left:10px;
+}
+
+.nonmap-container button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f7931a; /* Bitcoin orange background */
+    color: #fff;
+    font-size: 16px;
+}
