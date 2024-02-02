@@ -38,16 +38,36 @@
     </body>
 </html>
 <script type="text/javascript">
-    (async () => {
-        let rMaplocks = await fetch(dataURL + "maplocksCached.json");
-        let data = await rMaplocks.json()
-        let divHTML = ""
-        console.log(JSON.stringify(data))
-        for (let i = 0; i < data.length; i++) {
-            // if (data[i].txid === null || data[i].name === null) continue;
-            divHTML += `<li class="item">${i + 1}.  <a href="/?txid=${data[i].txid}">${data[i].name}</a> - ${data[i].satoshis / 100000000} BSV</li>`
-        }
-        document.getElementById('items').innerHTML = divHTML;
+    function populateTable() {
+      return new Promise(function(resolve, reject) {
+        var url = dataURL + "rankingsAll.json"
+        fetch(url).then(function(r) {
+          return r.json()
+        }).then(async (response) => {
+          let rMaplocks = await fetch(dataURL + "maplocksCached.json");
+          let resultMaplocks = await rMaplocks.json()
 
+          let text = "";
+          let i = 1;
+          for (let x in response) {
+            if (response[x].txid !== "undefined") {
+              let name = ""
+              if (response[x].dataType === 'maplocks.com') name = resultMaplocks[response[x].txid];
+              else continue;
+              text += `<li class="item">${i}.  <a href="/?txid=${response[x].txid}">${name}</a> - ${parseFloat(response[x].sumSatoshis)} ₿</li>`
+            }
+            i++
+          }
+          document.getElementById('items').innerHTML = text;
+        })
+        .catch(error => {
+          console.log(error)
+          reject(error)
+        })
+      })
+    }
+
+    (async () => {
+      populateTable()
     })().catch(e => console.log("Caught: " + e)); // Catches it.
 </script>
