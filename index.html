@@ -35,10 +35,6 @@
     <div id="mainContainer">
       <div id="mapDiv">
         <div id="map"></div>
-        <button class="btn shuallet" id="walletButton" onclick="location.href='/wallet/';">
-            <img src="/assets/shuacoin.png" class="shuapng">
-            <span class="btn-text">SHUAllet</span>
-        </button>
       </div>
       <div id="bars"></div>
       <div id="sidebar"></div>
@@ -647,6 +643,12 @@
             longit = position.long
             map.setView([latit, longit]);
             addUserMarker(latit, longit)
+        }).addTo(map);
+        L.easyButton('<img src="/assets/icon-filter.svg" class="leaflet_button">', async function(btn, map){
+            
+        }).addTo(map);
+        L.easyButton('<img src="/assets/icon-wallet.svg" class="leaflet_button">', function(btn, map){
+            window.location.href='/wallet/';
         }).addTo(map);
         if (localStorage.walletAddress) {
             L.easyButton('<img src="/assets/icon-profile-user.svg" class="leaflet_button">', function(btn, map){
