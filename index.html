@@ -196,6 +196,12 @@
     const hideLikeCommentForm = (index) => {
         document.getElementById('likeCommentForm_' + index).style.display = 'none';
     }
+    const showCustomCategory = () => {
+        if (document.getElementById('newPointCategory').value === 'other') {
+            document.getElementById('newPointCategory').style.display = 'none';
+            document.getElementById('newPointCategoryCustom').style.display = 'inline-block';
+        }
+    }
 
     const pointsToMarkers = async () => {
         markerLayerGroup.clearLayers()
@@ -223,7 +229,13 @@
         const currentHeight = await getBlock();
         let lockHeight = parseInt(currentHeight) + parseInt(document.getElementById('lockBlocks').value);
         let satoshis = 1;
-        let content = document.getElementById('newPointCoordinates').value + " " + document.getElementById('newPointName').value + "\n" + document.querySelector(".ql-editor").innerHTML;
+        let category = document.getElementById('newPointCategory').value
+        if (category === 'other') category = document.getElementById('newPointCategoryCustom').value
+
+        let content = document.getElementById('newPointCoordinates').value + " " + document.getElementById('newPointName').value + "\n" + document.querySelector(".ql-editor").innerHTML + "[" + category + "]" + "[" + document.getElementById('newPointPrice').value + "]";
+
+        console.log(content)
+        return
 
         let rawtx = lockPost(localStorage.walletAddress, lockHeight, satoshis, null, content, null);
         if (rawtx) {
@@ -521,7 +533,18 @@
     const showUserMarkerSidebar = async (lat,lng) => {
         var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
             <div class="tooltip-content popupForm"><input type="point" id="newPointCoordinates" class="long" value="[${lat}, ${lng}]"></div>
-            <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="name" placeholder="name"></div>
+            <div class="tooltip-content popupForm"><input id="newPointName" class="long" type="text" placeholder="name"></div>
+            <div class="tooltip-content popupForm" id="categoryStandard">
+                <select id="newPointCategory" name="category" style="width:45%" onchange="showCustomCategory()">
+                    <option value="">Select category</option>
+                    <option value="Real estates">Real estates</option>
+                    <option value="Buy">Buy</option>
+                    <option value="Sell">Sell</option>
+                    <option value="other">Other</option>
+                </select>
+                <input id="newPointCategoryCustom" type="text" placeholder="category" style="width:45%;display:none;">
+                <input id="newPointPrice" type="number" placeholder="price" style="width:45%;">
+            </div>
             <div class="tooltip-content popupForm">
                 <div id="standalone-container">
                   <div id="toolbar-container">
