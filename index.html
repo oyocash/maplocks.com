@@ -234,9 +234,6 @@
 
         let content = document.getElementById('newPointCoordinates').value + " " + document.getElementById('newPointName').value + "\n" + document.querySelector(".ql-editor").innerHTML + "[" + category + "]" + "[" + document.getElementById('newPointPrice').value + "]";
 
-        console.log(content)
-        return
-
         let rawtx = lockPost(localStorage.walletAddress, lockHeight, satoshis, null, content, null);
         if (rawtx) {
             // const c = confirm(`Add location "${document.getElementById('newPointCoordinates').value}"?`);
