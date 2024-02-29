@@ -198,8 +198,16 @@
     }
     const showCustomCategory = () => {
         if (document.getElementById('newPointCategory').value === 'other') {
+            document.getElementById('newPointCategory').value = '';
             document.getElementById('newPointCategory').style.display = 'none';
             document.getElementById('newPointCategoryCustom').style.display = 'inline-block';
+        }
+    }
+    const showFilterCustomCategory = (show = 0) => {
+        if (show === 1 || document.getElementById('filterCategory').value === 'other') {
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterCategory').style.display = 'none';
+            document.getElementById('filterCategoryCustom').style.display = 'inline-block';
         }
     }
 
@@ -466,21 +474,23 @@
         document.getElementById('commentsList').innerHTML = commentHTML;
     }
 
-    const getGeoPoints = async (northEastLat, northEastLng, southWestLat, southWestLng) => {
+    const getGeoPoints = async (northEastLat, northEastLng, southWestLat, southWestLng, category = null) => {
         const r = await fetch(`${dataURL}getMaplocks/`, {
             method: 'post',
-            body: JSON.stringify({ northEastLat, northEastLng, southWestLat, southWestLng })
+            body: JSON.stringify({ northEastLat, northEastLng, southWestLat, southWestLng, category })
         })
         const res = await r.text();
         return JSON.parse(res);
     }
 
     const populatePoints = async () => {
+        var category = localStorage.getItem("filter.category")
         // get bounds
         var bounds = map.getBounds();
         var northEast = bounds.getNorthEast();
         var southWest = bounds.getSouthWest();
-        geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
+        if (!category !== null && category !== '') geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng, category);
+        else geoPoints = await getGeoPoints(northEast.lat, northEast.lng, southWest.lat, southWest.lng)
         geoPoints = localGeoPoints.concat(geoPoints)  // add locally stored geo points
 
         pointsToMarkers()
@@ -526,6 +536,47 @@
             userMarker = new L.Marker([lat, lng], {icon: bitWhiteIcon}).addTo(map);
             userMarker.bindPopup(`<a onclick="showUserMarkerSidebar(${lat}, ${lng})">Add this location</a>`).openPopup();
         }  
+    }
+    const showFilters = async() => {
+        let category = localStorage.getItem('filter.category')
+        var filtersTooltip = `<div class="tooltip-title">Filters</div>
+            <div class="tooltip-content popupForm" id="categoryStandard">
+                Category: 
+                <select id="filterCategory" name="filterCategory" style="width:45%" onchange="showFilterCustomCategory()">
+                    <option value="">All</option>
+                    <option value="Real estates">Real estates</option>
+                    <option value="Buy">Buy</option>
+                    <option value="Sell">Sell</option>
+                    <option value="other">Other</option>
+                </select>
+                <input id="filterCategoryCustom" type="text" placeholder="category" style="width:45%;display:none;">
+            </div>
+
+            <div class="tooltip-content popupForm">
+                <button onclick="applyFilters()">Filter</button>
+            </div>`
+
+
+        sidebar.setContent(filtersTooltip);
+        if (category === null || category === '' || category === 'Real estates' || category === 'Buy' || category === 'Sell') {
+            document.getElementById('filterCategory').value = category
+        } else {
+            showFilterCustomCategory(1)
+            document.getElementById('filterCategoryCustom').value = category
+        }
+        sidebar.show();
+    }
+    const applyFilters = async() => {
+        let category = document.getElementById('filterCategory').value
+        if (document.getElementById('filterCategoryCustom').value) category = document.getElementById('filterCategoryCustom').value
+        localStorage.setItem('filter.category', category)
+        populatePoints();
+        sidebar.hide();
+        visualFilters()
+    }
+    const visualFilters = () => {
+        if (localStorage.getItem("filter.category") && localStorage.getItem("filter.category") !== '') document.getElementById('iconFilter').classList.add("svg-filter-red");
+        else document.getElementById('iconFilter').classList.remove("svg-filter-red");
     }
     const showUserMarkerSidebar = async (lat,lng) => {
         var contentUserMarkerTooltip = `<div class="tooltip-title">Add a maplock</div>
@@ -664,8 +715,8 @@
             map.setView([latit, longit]);
             addUserMarker(latit, longit)
         }).addTo(map);
-        L.easyButton('<img src="/assets/icon-filter.svg" class="leaflet_button">', async function(btn, map){
-            
+        L.easyButton('<img src="/assets/icon-filter.svg" class="leaflet_button" id="iconFilter">', async function(btn, map){
+            showFilters();
         }).addTo(map);
         L.easyButton('<img src="/assets/icon-wallet.svg" class="leaflet_button">', function(btn, map){
             window.location.href='/wallet/';
@@ -715,7 +766,8 @@
     }
 
     (async () => {
-        await populateMap()
+        await populateMap()        
+        visualFilters()
         if (getUrlVars()["txid"]) {
             const result = await fetch(`${dataURL}getMaplock/${getUrlVars()["txid"]}`)
             const resultJSON = await result.json()
