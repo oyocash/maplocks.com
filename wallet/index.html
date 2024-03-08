@@ -41,11 +41,13 @@
             </div>
         </div>
         <input type="file" id="uploadFile" accept=".json" hidden>
-        <script src="/scripts/shuallet.bundle.js?1"></script>
+        <script src="/scripts/shuallet.bundle.js?2"></script>
     </body>
 </html>
 
 <script type="text/javascript">
+    if (localStorage.walletAddress) getNewUtxos();
+    
     document.addEventListener("DOMContentLoaded", function() {
         if(!localStorage.getItem('disclaimerShown')) {
             alert("Disclaimer\n\nPlease be reminded that we accept no responsibility for any financial losses occurred to users as a result of using this app. Use at your own risk.")
